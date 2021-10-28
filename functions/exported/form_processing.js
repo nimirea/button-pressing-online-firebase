@@ -137,19 +137,21 @@ exports.submitData = function(surveyData) {
   let is_eligible = true;
 
   // check whether surveyData has the right fields
-  if (surveyData.available_2 === undefined ||
-      surveyData.available_4 === undefined ||
+  if (surveyData.available === undefined ||
       surveyData.email === undefined ||
       surveyData.native_lang === undefined ||
       surveyData.age18orolder === undefined ||
-      surveyData.disorder === undefined
+      surveyData.disorder === undefined ||
+      surveyData.headphones === undefined ||
+      surveyData.keyboard_letters === undefined ||
+      surveyData.keyboard_letters === undefined
     ) {
     is_eligible = false;
   } else {
 
     // check that fields have the correct data
 
-    if (surveyData.available_2 === 'no' || surveyData.available_4 === 'no') {
+    if (surveyData.available === 'No') {
       // are they available?
       is_eligible = false;
     } else if (surveyData.native_lang !== 'English') {
@@ -164,11 +166,11 @@ exports.submitData = function(surveyData) {
     } else if (surveyData.headphones.length === 0) {
       // is the headphones array empty?
       is_eligible = false;
-    } else if (surveyData.microphones.length === 0) {
-      // do they have a microphone?
+    } else if (surveyData.keyboard_letters !== 'QWERTY') {
+      // do they have a QWERTY keyboard?
       is_eligible = false;
-    } else if (surveyData.microphones.length === 1 && surveyData.microphones[0] === 'Microphone on Bluetooth headphones') {
-      // is their only microphone part of Bluetooth headphones?
+    } else if (surveyData.keyboard_numbers === 'No') {
+      // do they have a number row at the top of their keyboard?
       is_eligible = false;
     }
 
@@ -230,7 +232,7 @@ exports.submitData = function(surveyData) {
             })
         } else {
           return mail.send_as_template(
-            "Participating in Multiple-Day Research Study",
+            "Participating in Multiple-Day Button-Pressing Research Study",
             "consent_link",
             {
               consent_link: "https://" + constants.urls.exp + "/?email=" + to_upload.email
