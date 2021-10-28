@@ -13,10 +13,6 @@ const main_experimenter_email = process.env.GOOGLE_USERNAME
 const bookings_calendar = process.env.EXP_BOOKINGS_CALENDAR
 const availability_calendar = process.env.EXP_AVAILABILITY_CALENDAR // calendar for experimenter availability
 
-// what days of the week should pickup and dropoff appointments be?
-const pickup_day = "Monday"
-const dropoff_day = "Friday"
-
 // default values for location
 const location =  {
   name: process.env.EXP_LOCATION_NAME,
@@ -34,8 +30,6 @@ module.exports = {
   main_experimenter_email,
   bookings_calendar,
   availability_calendar,
-  pickup_day,
-  dropoff_day,
   email_templates_dir,
   location,
   daily_email_time,

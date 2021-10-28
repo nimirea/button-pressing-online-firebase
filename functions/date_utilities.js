@@ -86,7 +86,7 @@ exports.getWeek = function(date_obj) {
 *            }
 *          }
 */
-exports.getTimeDiff = function(date_obj1, date_obj2, units = "ms") {
+let getTimeDiff = function(date_obj1, date_obj2, units = "ms") {
   let result = {}
 
   // constants array is formatted in the singular
@@ -104,4 +104,26 @@ exports.getTimeDiff = function(date_obj1, date_obj2, units = "ms") {
   }
 
   return result;
+}
+exports.getTimeDiff = getTimeDiff
+
+/**
+* Return whether datetime object is between two other datetime objects (True/False)
+* @param {Date} test Datetime object to test
+* @param {Date} a One end of the scale
+* @param {Date} b The other end of the scale
+* @return {Boolean} True if `test` is between `a` and `b`, False otherwise
+*/
+exports.timeIsBetween = function(test, a, b) {
+
+  let structured_dates = getTimeDiff(a,b,'ms').dates
+  let result = false
+
+  if (test.getTime() >= structured_dates.earlier &&
+      test.getTime() <= structured_dates.later ) {
+        result = true
+  }
+
+  return(result)
+
 }

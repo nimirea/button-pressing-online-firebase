@@ -12,10 +12,7 @@ const date_utils = require('../date_utilities')
 * Get still-available timeslots
 * @return {Promise} with a data array containing the reponse
 */
-let getAvailableTimeslots = function (include_dropoffs = true) {
-  if (include_dropoffs === null) {
-    include_dropoffs = true;
-  }
+let getAvailableTimeslots = function () {
   var events_list;
   var prev_booked;
 
@@ -28,85 +25,87 @@ let getAvailableTimeslots = function (include_dropoffs = true) {
     search_in: constants.availability_calendar
   }).then((data) => {
       events_list = data.items;
+      let result = [];
 
-      if (events_list === undefined || events_list.length === 0) {
-        return [];
-      } else {
-
-        // find all slots that have been set up
-        return cal.calendarInteract("find", {
+      if (events_list !== undefined && events_list.length > 0) {
+        result = cal.calendarInteract("find", {
           search_in: constants.bookings_calendar,
           minTime: events_list[0].start['dateTime'],
           maxTime: events_list[events_list.length - 1].end['dateTime']
-        }).then((data) => {
+        })
+      }
 
-          // store start time in prev_booked only
-          prev_booked = data.items.map(function(item) {
-            // translate to UTC time
-            return date_utils.parseISOLocal(item.start['dateTime']).toISOString()
-          });
+      return result;
+    }).then((data) => {
 
-          // parameters for splitting up slots
-          let appt_slots = []
-          let appt_length = constants.appt_length_mins // appointment length in minutes
-          let time_markers = ["startTime", "endTime"]
-          let date_divider = ", "
-          let blockInfo = {}
-          let weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+      prev_booked = data.items.map((item) => {
+        // translate to UTC time
+        return date_utils.parseISOLocal(item.start['dateTime'])
+      });
 
-          // store all available appointment blocks in appt_blocks
-          for (var cal_event in events_list) {
+      // parameters for splitting up slots
+      let appt_slots = []
+      let appt_length = constants.appt_length_mins // appointment length in minutes
+      let time_markers = ["startTime", "endTime"]
+      let date_divider = ", "
+      let blockInfo = {}
+      let weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
-            blockInfo = {
-              startTime: date_utils.parseISOLocal(events_list[cal_event].start['dateTime']),
-              endTime: date_utils.parseISOLocal(events_list[cal_event].end['dateTime'])
+      // store all available appointment blocks in appt_blocks
+      for (var cal_event in events_list) {
+
+        blockInfo = {
+          startTime: date_utils.parseISOLocal(events_list[cal_event].start['dateTime']),
+          endTime: date_utils.parseISOLocal(events_list[cal_event].end['dateTime'])
+        }
+        blockInfo.dayOfWeek = blockInfo.startTime.getDay() // 1 for Monday, 5 for Friday
+        blockInfo.week = date_utils.getWeek(blockInfo.startTime)
+
+        // check that this slot isn't booked already
+        let blockBooked = false
+        for (var prev_booked_start in prev_booked) {
+          if (date_utils.timeIsBetween(prev_booked_start, blockInfo.startTime, blockInfo.endTime) === true) {
+            blockBooked = true
+          }
+        }
+
+        // split block into chunks
+        if (!blockBooked) {
+          let availability_length = date_utils.getTimeDiff(blockInfo.startTime, blockInfo.endTime, "minutes").diff
+          for (var slot_idx = 0 ; slot_idx < availability_length/appt_length; slot_idx++ ) {
+
+            slotInfo = {
+              dayOfWeek: weekdays[blockInfo.dayOfWeek],
+              week: blockInfo.week, // for filtering by appointments in same week
+              slotIdx: slot_idx,
+              offsetMins: []
             }
-            blockInfo.dayOfWeek = blockInfo.startTime.getDay() // 1 for Monday, 5 for Friday
-            blockInfo.week = date_utils.getWeek(blockInfo.startTime)
 
-            if (include_dropoffs === true || weekdays[blockInfo.dayOfWeek] !== constants.dropoff_day) {
+            for (var tt in time_markers) {
+              tt = Number(tt)
+              let time_type = time_markers[tt]
+              adjusted_time = new Date(blockInfo.startTime)
+              adjusted_time.setMinutes( adjusted_time.getMinutes() + (slot_idx + tt) * appt_length)
 
-              // split block into chunks
-              let availability_length = date_utils.getTimeDiff(blockInfo.startTime, blockInfo.endTime, "minutes").diff
-              for (var slot_idx = 0 ; slot_idx < availability_length/appt_length; slot_idx++ ) {
-
-                slotInfo = {
-                  dayOfWeek: weekdays[blockInfo.dayOfWeek],
-                  week: blockInfo.week, // for filtering by appointments in same week
-                  slotIdx: slot_idx,
-                  offsetMins: []
-                }
-
-                for (var tt in time_markers) {
-                  tt = Number(tt)
-                  let time_type = time_markers[tt]
-                  adjusted_time = new Date(blockInfo.startTime)
-                  adjusted_time.setMinutes( adjusted_time.getMinutes() + (slot_idx + tt) * appt_length)
-
-                  slotInfo[time_type] = adjusted_time.toISOString()
-                  slotInfo[time_type + "_local"] = adjusted_time.toLocaleString("en-US", {timeZone: "America/Chicago"});
-                }
-
-                // check that this slot isn't booked already
-                if (!(prev_booked.includes(slotInfo.startTime))) {
-
-                  // manipulate strings for Chicago time
-                  let startInfo = slotInfo.startTime_local.split(date_divider)
-                  let stopTime = slotInfo.endTime_local.split(date_divider)[1].replace(":00 ", " ")
-                  let startTime = startInfo[1].replace(":00 ", " ")
-                  slotInfo["label"] = startTime + " to " + stopTime + " on " + slotInfo.dayOfWeek + ", " + startInfo[0];
-
-                  appt_slots.push(slotInfo)
-                }
-              }
-
+              slotInfo[time_type] = adjusted_time.toISOString()
+              slotInfo[time_type + "_local"] = adjusted_time.toLocaleString("en-US", {timeZone: "America/Chicago"});
             }
+
+            // manipulate strings for Chicago time
+            let startInfo = slotInfo.startTime_local.split(date_divider)
+            let stopTime = slotInfo.endTime_local.split(date_divider)[1].replace(":00 ", " ")
+            let startTime = startInfo[1].replace(":00 ", " ")
+            slotInfo["label"] = startTime + " to " + stopTime + " on " + slotInfo.dayOfWeek + ", " + startInfo[0];
+
+            appt_slots.push(slotInfo)
 
           }
+        }
 
-          return appt_slots
-        });
       }
+
+      return appt_slots
+
     })
 }
 
