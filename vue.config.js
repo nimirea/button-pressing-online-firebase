@@ -18,7 +18,7 @@ module.exports = {
   pages: {
     index: {
       entry: 'src/main.js',
-      title: 'Tongue Twisters Across Multiple Nights Study'
+      title: 'Button-Pressing Across Multiple Nights Study'
     }
   }
 }
