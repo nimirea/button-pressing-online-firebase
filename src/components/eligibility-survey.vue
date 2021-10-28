@@ -37,50 +37,42 @@
       v-model="survey_answers.headphones"
     ></checkbox-question>
 
-    <p>What type(s) of microphone do you have access to? (check all that apply)</p>
+    <p>What are the first (leftmost) five letters on the top row of your computer keyboard?</p>
+    <radio-button-question
+      v-model="survey_answers.keyboard_letters"
+      group-id="keyboard_letters"
+      @error-catch="updateFormErrors"
+      :labels="['QWERTY', 'QWERTZ', 'AZERTY']"
+    ></radio-button-question>
 
-    <checkbox-question
-      group-id="microphones"
-      v-model="survey_answers.microphones"
-      :options="[
-        'Computer\'s built-in microphone',
-        'Microphone on Bluetooth headphones',
-        'Microphone on wired headphones',
-        'Standalone USB microphone'
-      ]"
-    ></checkbox-question>
+    <p>Does your computer keyboard have a row of numbers at the top?</p>
+    <radio-button-question
+      v-model="survey_answers.keyboard_numbers"
+      group-id="keyboard_numbers"
+      @error-catch="updateFormErrors"
+      :labels="['Yes', 'No']"
+    ></radio-button-question>
 
     <h2>Availability</h2>
 
-    <p>If you choose to take part in our study, you may be asked to log into our online experiment at the same time every day for 4 weekdays in a row, for 30 minutes each day. For example, if you choose to start the study at 10am on March 15, you will be asked to log in on March 16, March 17, and March 18 at 10am:</p>
+    <p>If you choose to take part in our study, you will be asked to log into our online experiment at the same time every day for 2 weekdays in a row, for 1 hour each day (up to $30 total compensation). For example, if you choose to start the study at 10am on June 22, you will also be asked to log in on June 23 at 10am:</p>
 
     <img src="../assets/calendar.png" />
 
-    <p><b>Can you be available for 30 minutes at the same time, for four weekdays in a row, starting within the next month (in exchange for up to $40 total compensation)?</b></p>
+    <p><b>Can you be available for 1 hour at the same time of day, for two weekdays in a row, starting within the next month?</b></p>
 
     <radio-button-question
-      v-model="survey_answers.available_4"
-      group-id="available_4"
+      v-model="survey_answers.available"
+      group-id="available"
       @error-catch="updateFormErrors"
-      v-bind:labels="['Yes, I can be available for 4 weekdays in a row','No, I cannot be available for 4 weekdays in a row']"
-      :values="['yes', 'no']"
-    ></radio-button-question>
-
-    <p>There is a 1 in 3 chance that you will be asked to log in to our online experiment at the same time for 2 days in a row instead, for 30 minutes each day. This will be determined randomly, like the roll of a dice, and neither you nor the experimenter will have control over whether you will be asked to log in for two days or four days. <b>Can you be available for 30 minutes at the same time, for <i>two</i> weekdays in a row, starting within the next month (in exchange for up to $20 total compensation)?</b></p>
-
-    <radio-button-question
-      v-model="survey_answers.available_2"
-      group-id="available_2"
-      @error-catch="updateFormErrors"
-      v-bind:labels="['Yes, I can be available for 2 weekdays in a row','No, I cannot be available for 2 weekdays in a row']"
-      :values="['yes', 'no']"
+      :labels="['Yes', 'No']"
     ></radio-button-question>
 
     <h2>Contact</h2>
     <textbox-question
       v-model="survey_answers.email"
       @error-catch="updateFormErrors"
-      question-text="Please enter your email address, so we can contact you if you are eligible:"
+      question-text="Please provide your email address, so we can contact you if you are eligible:"
       text-type="email"
     ></textbox-question>
 
@@ -96,12 +88,12 @@
   <div v-else>
     <div v-if="returned_data.is_eligible && returned_data.waiting_list === false">
       <h1>Congratulations!</h1>
-      <p>You are eligible to participate in the {{ returned_data.study_length }}-day version of our study.</p>
+      <p>You are eligible to participate in our study.</p>
       <p>You should receive an email with a link to our consent form and instructions on how to pick up and drop off your equipment on campus. If you have not received this email in one hour, please contact the research team at <a href="mailto:multinight.study@gmail.com">multinight.study@gmail.com</a>.</p>
     </div>
     <div v-else-if="returned_data.is_eligible && returned_data.waiting_list === true">
       <h1>You're eligible, but the study is full right now</h1>
-      <p>You are eligible to participate in the {{ returned_data.study_length }}-day version of our study, but we do not have any open timeslots right now. We will email you when more spots open up!</p>
+      <p>You are eligible to participate in our study, but we do not have any open timeslots right now. We will email you when more spots open up!</p>
     </div>
     <div v-else>
       <h1>Thank you for your response</h1>
@@ -145,11 +137,12 @@ export default {
       // check for completeness, for fields that should be complete
       if (
         this.survey_answers.email == null ||
-        this.survey_answers.available_2 == null ||
-        this.survey_answers.available_4 == null ||
+        this.survey_answers.available == null ||
         this.survey_answers.age18orolder == null ||
         this.survey_answers.native_lang == null ||
-        this.survey_answers.disorder == null
+        this.survey_answers.disorder == null ||
+        this.survey_answers.keyboard_letters == null ||
+        this.survey_answers.keyboard_numbers == null
       ) {
         this.perfectFormState = false
       } else {
