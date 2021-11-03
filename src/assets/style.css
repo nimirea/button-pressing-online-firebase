@@ -223,6 +223,7 @@ input, textarea {
   margin-right:1rem;
   max-width: 100%;
   flex-grow: 1;
+  flex-shrink: 2;
   padding: 1rem 0;
   display: flex;
   flex-flow: row nowrap;
@@ -237,10 +238,11 @@ input, textarea {
 
 .example-img {
   /* max-width: 100%; */
-  max-width: 50%;
+  max-width: 45%;
+  min-width:12rem;
   display:block;
   vertical-align: middle;
-  flex-shrink:2;
+  flex-shrink:0;
 }
 
 .inline-option-list, .inline-option-list span {
