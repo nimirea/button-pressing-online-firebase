@@ -13,13 +13,32 @@
       :labels="['English', 'other']"
     ></radio-button-question>
 
-    <p>Do you have any history of speech, language, hearing, and/or sleep disorder?</p>
+    <p>Do you have any history of speech, language, and/or hearing disorder?</p>
     <radio-button-question
-      v-model="survey_answers.disorder"
-      group-id="disorder"
+      v-model="survey_answers.lang_disorder"
+      group-id="lang_disorder"
       @error-catch="updateFormErrors"
       :labels="['Yes', 'No']"
     ></radio-button-question>
+
+    <p>Do you have any history of sleep disorder?</p>
+    <radio-button-question
+      v-model="survey_answers.sleep_disorder"
+      group-id="sleep_disorder"
+      @error-catch="updateFormErrors"
+      :labels="['Yes', 'No']"
+    ></radio-button-question>
+
+    <p>Do you have any history of colorblindness or color vision deficiency? (check all that apply)</p>
+    <checkbox-question
+      v-model="survey_answers.colorblind"
+      group-id="colorblind"
+      @error-catch="updateFormErrors"
+      :options="[
+        'I have trouble distinguishing red and green',
+        'I have trouble distinguishing blue and yellow',
+        'I have total colorblindness (achromatopisa)']"
+    ></checkbox-question>
 
     <p>Are you 18 years of age or older?</p>
     <radio-button-question
@@ -141,9 +160,9 @@ export default {
         this.survey_answers.available == null ||
         this.survey_answers.age18orolder == null ||
         this.survey_answers.native_lang == null ||
-        this.survey_answers.disorder == null ||
-        this.survey_answers.keyboard_letters == null ||
-        this.survey_answers.keyboard_numbers == null
+        this.survey_answers.lang_disorder == null ||
+        this.survey_answers.sleep_disorder == null ||
+        this.survey_answers.computer == null
       ) {
         this.perfectFormState = false
       } else {
