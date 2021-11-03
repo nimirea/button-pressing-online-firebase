@@ -243,6 +243,7 @@ input, textarea {
   display:block;
   vertical-align: middle;
   flex-shrink:0;
+  border-radius: 0.5rem;
 }
 
 .inline-option-list, .inline-option-list span {
