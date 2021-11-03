@@ -65,8 +65,8 @@ export default {
   },
   filters: {
     regularize: function (value) {
-      value = value.replace(" ", "-")
-      value = value.replace(".", "")
+      value = value.replaceAll(" ", "-")
+      value = value.replaceAll(".", "")
 
       return (value)
 
