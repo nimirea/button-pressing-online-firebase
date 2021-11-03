@@ -48,9 +48,9 @@
       v-model="survey_answers.ports"
       group-id="ports"
       :options="['USB Type A (most common USB port)', 'USB Type C (MacBook)']"
-      :examples="[
-        'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Usb_head_Cable.jpg/2560px-Usb_head_Cable.jpg',
-        'https://commons.wikimedia.org/wiki/File:Usb_head_Cable.jpg'
+      :exampleImgs="[
+        'usb-a.jpeg',
+        'usb-c.jpeg'
       ]"
     ></checkbox-question>
 

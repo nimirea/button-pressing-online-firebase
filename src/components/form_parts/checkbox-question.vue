@@ -15,9 +15,9 @@
       <label
         v-bind:for="options[n] | regularize"
         v-bind:key="options[n] | regularize"
-      >{{ options[n] }}<span v-if="examples.length > 0" class="example-link">:
-        <a :href="examples[n]" target="_blank" rel="noreferrer noopener">example picture</a>
-      </span>
+      >
+      <span>{{ options[n] }}</span>
+      <img v-if="exampleImgs.length > 0" class="example-img" :src="require('@/assets/'+exampleImgs[n])" />
     </label>
     </span>
   </div>
@@ -51,7 +51,7 @@ export default {
       type: Boolean,
       default: false
     },
-    examples: {
+    exampleImgs: {
       type: Array,
       default: function() {
         return []

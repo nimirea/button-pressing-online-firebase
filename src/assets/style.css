@@ -207,7 +207,7 @@ input, textarea {
   margin-bottom: 3rem;
 }
 
-.option-list span {
+.option-list > span {
   background-color: rgb(190,190,210);
   margin: 0.5rem 0;
   /* color: white; */
@@ -218,12 +218,29 @@ input, textarea {
   padding-left: 1rem;
 }
 
-.option-list span label {
+.option-list > span label {
   margin-left: 0.5rem;
-  display: block;
+  margin-right:1rem;
   max-width: 100%;
   flex-grow: 1;
   padding: 1rem 0;
+  display: flex;
+  flex-flow: row nowrap;
+  align-items:center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.option-list > span label > span {
+  display: block;
+}
+
+.example-img {
+  /* max-width: 100%; */
+  max-width: 50%;
+  display:block;
+  vertical-align: middle;
+  flex-shrink:2;
 }
 
 .inline-option-list, .inline-option-list span {
@@ -317,9 +334,9 @@ span.selected-option {
 .inline-textbox {
   display: inline;
 }
-.option-list span label {
+/* .option-list span label {
   display: inline-block;
-}
+} */
 .option-list span p {
   margin: 0;
 }
