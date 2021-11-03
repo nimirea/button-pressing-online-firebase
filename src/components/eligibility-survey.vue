@@ -37,21 +37,22 @@
       v-model="survey_answers.headphones"
     ></checkbox-question>
 
-    <p>What are the first (leftmost) five letters on the top row of your computer keyboard?</p>
+    <p>Do you have access to a desktop or laptop computer?</p>
     <radio-button-question
-      v-model="survey_answers.keyboard_letters"
-      group-id="keyboard_letters"
-      @error-catch="updateFormErrors"
-      :labels="['QWERTY', 'QWERTZ', 'AZERTY']"
+      v-model="survey_answers.computer"
+      group-id="computer"
     ></radio-button-question>
 
-    <p>Does your computer keyboard have a row of numbers at the top?</p>
-    <radio-button-question
-      v-model="survey_answers.keyboard_numbers"
-      group-id="keyboard_numbers"
-      @error-catch="updateFormErrors"
-      :labels="['Yes', 'No']"
-    ></radio-button-question>
+    <p>Which of the following ports do you have on your computer(s)? (check all that apply)</p>
+    <checkbox-question
+      v-model="survey_answers.ports"
+      group-id="ports"
+      :options="['USB Type A (most common USB port)', 'USB Type C (MacBook)']"
+      :examples="[
+        'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Usb_head_Cable.jpg/2560px-Usb_head_Cable.jpg',
+        'https://commons.wikimedia.org/wiki/File:Usb_head_Cable.jpg'
+      ]"
+    ></checkbox-question>
 
     <h2>Availability</h2>
 

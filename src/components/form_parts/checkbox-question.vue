@@ -1,21 +1,24 @@
 <template>
   <div class="checkboxes option-list">
     <span
-      v-for="option in options"
-      v-bind:key="option | regularize"
-      :class = "displayedValues.includes(option)? 'selected-option' : '' "
+      v-for="n in Array(options.length).keys()"
+      v-bind:key="options[n] | regularize"
+      :class = "displayedValues.includes($options.filters.regularize(options[n]))? 'selected-option' : '' "
     >
       <input type="checkbox"
-        v-bind:value="option"
-        v-bind:checked="displayedValues.includes(option)"
-        v-bind:id="option | regularize"
+        v-bind:value="options[n] | regularize"
+        v-bind:checked="displayedValues.includes(options[n])"
+        v-bind:id="options[n] | regularize"
         v-on:change="updateAppState"
         v-bind:disabled="unclickable === true"
       />&nbsp;
       <label
-        v-bind:for="option | regularize"
-        v-bind:key="option | regularize"
-      >{{ option }}</label>
+        v-bind:for="options[n] | regularize"
+        v-bind:key="options[n] | regularize"
+      >{{ options[n] }}<span v-if="examples.length > 0" class="example-link">:
+        <a :href="examples[n]" target="_blank" rel="noreferrer noopener">example picture</a>
+      </span>
+    </label>
     </span>
   </div>
 </template>
@@ -47,6 +50,12 @@ export default {
     unclickable: {
       type: Boolean,
       default: false
+    },
+    examples: {
+      type: Array,
+      default: function() {
+        return []
+      }
     }
   },
   data: function() {
