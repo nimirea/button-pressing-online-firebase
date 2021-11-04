@@ -12,9 +12,12 @@ const date_utils = require('../date_utilities')
 * Get still-available timeslots
 * @return {Promise} with a data array containing the reponse
 */
-let getAvailableTimeslots = function (include_dropoffs = True) {
+let getAvailableTimeslots = function (include_dropoffs = true) {
   var events_list;
   var prev_booked;
+  if (include_dropoffs === null) {
+    include_dropoffs = true;
+  }
 
   // set the start time for date search to tomorrow, because you should only be allowed to sign up 24 hours in advance
   var tomorrow = new Date();
@@ -67,7 +70,7 @@ let getAvailableTimeslots = function (include_dropoffs = True) {
             blockInfo.eventType = "dropoff"
           }
 
-          if (include_dropoffs === true || blockInfo.eventType == "pickup") {
+          if (include_dropoffs === true || blockInfo.eventType === "pickup") {
 
             // split block into chunks
             let availability_length = date_utils.getTimeDiff(blockInfo.startTime, blockInfo.endTime, "minutes").diff

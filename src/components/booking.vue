@@ -211,14 +211,14 @@ export default {
         }
       })
     },
-    filterApptOptions: function(desired_day, desired_week) {
+    filterApptOptions: function(desired_eventType, desired_week) {
       let return_obj = {
         'labels': [],
         'values': []
       }
 
       this.available_timeslots.forEach((timeslot, idx) => {
-        if (timeslot.dayOfWeek === desired_day && (desired_week === undefined || timeslot.week == desired_week)) {
+        if (timeslot.eventType === desired_eventType && (desired_week === undefined || timeslot.week == desired_week)) {
           return_obj.labels.push(timeslot.label)
           return_obj.values.push(idx)
         }
@@ -246,13 +246,13 @@ export default {
   },
   computed: {
     pickup_times: function() {
-      return this.filterApptOptions("Monday")
+      return this.filterApptOptions("pickup")
     },
     dropoff_times: function() {
       if (this.appointment_choices.pickup === undefined) {
         return {}
       } else {
-        return this.filterApptOptions("Friday", this.available_timeslots[this.appointment_choices.pickup].week)
+        return this.filterApptOptions("dropoff", this.available_timeslots[this.appointment_choices.pickup].week)
       }
     }
   },
