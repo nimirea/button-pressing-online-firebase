@@ -34,61 +34,67 @@ let getAvailableTimeslots = function () {
           maxTime: events_list[events_list.length - 1].end['dateTime']
         })
       }
-
-      return result;
     }).then((data) => {
 
-      prev_booked = data.items.map((item) => {
-        // translate to UTC time
-        return date_utils.parseISOLocal(item.start['dateTime'])
-      });
+        // store start time in prev_booked only
+        prev_booked = data.items.map((item) => {
+          // translate to UTC time
+          return date_utils.parseISOLocal(item.start['dateTime']).toISOString()
+        });
 
-      // parameters for splitting up slots
-      let appt_slots = []
-      let appt_length = constants.appt_length_mins // appointment length in minutes
-      let time_markers = ["startTime", "endTime"]
-      let date_divider = ", "
-      let blockInfo = {}
-      let weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+        // parameters for splitting up slots
+        let appt_slots = []
+        let appt_length = constants.appt_length_mins // appointment length in minutes
+        let time_markers = ["startTime", "endTime"]
+        let date_divider = ", "
+        let blockInfo = {}
+        let weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
-      // store all available appointment blocks in appt_blocks
-      for (var cal_event in events_list) {
+        // store all available appointment blocks in appt_blocks
+        for (var cal_event in events_list) {
 
-        blockInfo = {
-          startTime: date_utils.parseISOLocal(events_list[cal_event].start['dateTime']),
-          endTime: date_utils.parseISOLocal(events_list[cal_event].end['dateTime'])
-        }
-        blockInfo.dayOfWeek = blockInfo.startTime.getDay() // 1 for Monday, 5 for Friday
-        blockInfo.week = date_utils.getWeek(blockInfo.startTime)
-
-        // check that this slot isn't booked already
-        let blockBooked = false
-        for (var prev_booked_start in prev_booked) {
-          if (date_utils.timeIsBetween(prev_booked_start, blockInfo.startTime, blockInfo.endTime) === true) {
-            blockBooked = true
+          blockInfo = {
+            startTime: date_utils.parseISOLocal(events_list[cal_event].start['dateTime']),
+            endTime: date_utils.parseISOLocal(events_list[cal_event].end['dateTime'])
           }
-        }
+          blockInfo.dayOfWeek = blockInfo.startTime.getDay() // 1 for Monday, 5 for Friday
+          blockInfo.week = date_utils.getWeek(blockInfo.startTime)
+          blockInfo.title = events_list[cal_event].summary
 
-        // split block into chunks
-        if (!blockBooked) {
-          let availability_length = date_utils.getTimeDiff(blockInfo.startTime, blockInfo.endTime, "minutes").diff
-          for (var slot_idx = 0 ; slot_idx < availability_length/appt_length; slot_idx++ ) {
+          if (include_dropoffs === true || blockInfo.title.includes("dropoff")) {
 
-            slotInfo = {
-              dayOfWeek: weekdays[blockInfo.dayOfWeek],
-              week: blockInfo.week, // for filtering by appointments in same week
-              slotIdx: slot_idx,
-              offsetMins: []
-            }
+            // split block into chunks
+            let availability_length = date_utils.getTimeDiff(blockInfo.startTime, blockInfo.endTime, "minutes").diff
+            for (var slot_idx = 0 ; slot_idx < availability_length/appt_length; slot_idx++ ) {
 
-            for (var tt in time_markers) {
-              tt = Number(tt)
-              let time_type = time_markers[tt]
-              adjusted_time = new Date(blockInfo.startTime)
-              adjusted_time.setMinutes( adjusted_time.getMinutes() + (slot_idx + tt) * appt_length)
+              slotInfo = {
+                dayOfWeek: weekdays[blockInfo.dayOfWeek],
+                week: blockInfo.week, // for filtering by appointments in same week
+                slotIdx: slot_idx,
+                offsetMins: []
+              }
 
-              slotInfo[time_type] = adjusted_time.toISOString()
-              slotInfo[time_type + "_local"] = adjusted_time.toLocaleString("en-US", {timeZone: "America/Chicago"});
+              for (var tt in time_markers) {
+                tt = Number(tt)
+                let time_type = time_markers[tt]
+                adjusted_time = new Date(blockInfo.startTime)
+                adjusted_time.setMinutes( adjusted_time.getMinutes() + (slot_idx + tt) * appt_length)
+
+                slotInfo[time_type] = adjusted_time.toISOString()
+                slotInfo[time_type + "_local"] = adjusted_time.toLocaleString("en-US", {timeZone: "America/Chicago"});
+              }
+
+              // check that this slot isn't booked already
+              if (!(prev_booked.includes(slotInfo.startTime))) {
+
+                // manipulate strings for Chicago time
+                let startInfo = slotInfo.startTime_local.split(date_divider)
+                let stopTime = slotInfo.endTime_local.split(date_divider)[1].replace(":00 ", " ")
+                let startTime = startInfo[1].replace(":00 ", " ")
+                slotInfo["label"] = startTime + " to " + stopTime + " on " + slotInfo.dayOfWeek + ", " + startInfo[0];
+
+                appt_slots.push(slotInfo)
+              }
             }
 
             // manipulate strings for Chicago time
@@ -102,12 +108,11 @@ let getAvailableTimeslots = function () {
           }
         }
 
-      }
+        }
 
-      return appt_slots
-
-    })
-}
+        return appt_slots
+      });
+    }
 
 /**
 * Get booked timeslots
