@@ -138,7 +138,6 @@ export default {
   name: 'consent-form',
   props: ['pptId', 'record'],
   components: {
-    checkboxQuestion,
     loadingView
   },
   data: function() {
