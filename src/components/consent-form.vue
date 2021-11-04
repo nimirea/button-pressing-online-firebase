@@ -132,7 +132,6 @@
 <script>
 
 import { fb_functions } from "../fb_init.js"
-import checkboxQuestion from './form_parts/checkbox-question.vue'
 import loadingView from './loading-view.vue'
 
 export default {
