@@ -141,10 +141,11 @@ exports.submitData = function(surveyData) {
       surveyData.email === undefined ||
       surveyData.native_lang === undefined ||
       surveyData.age18orolder === undefined ||
-      surveyData.disorder === undefined ||
+      surveyData.lang_disorder === undefined ||
+      surveyData.sleep_disorder === undefined ||
       surveyData.headphones === undefined ||
-      surveyData.keyboard_letters === undefined ||
-      surveyData.keyboard_letters === undefined
+      surveyData.computer === undefined ||
+      surveyData.ports === undefined
     ) {
     is_eligible = false;
   } else {
@@ -157,8 +158,19 @@ exports.submitData = function(surveyData) {
     } else if (surveyData.native_lang !== 'English') {
       // do they not have English as native language?
       is_eligible = false;
-    } else if (surveyData.native_lang === 'Yes') {
-      // do they have a history of disorder
+    } else if (surveyData.lang_disorder === 'Yes') {
+      // do they have a history of language disorder
+      is_eligible = false;
+    } else if (surveyData.sleep_disorder === 'Yes') {
+      // do they have a history of sleep disorder
+      is_eligible = false;
+    } else if (
+      (
+        surveyData.colorblind !== null &&
+        typeof(surveyData.colorblind) !== "undefined"
+      ) &&
+      surveyData.colorblind.includes("I-have-total-colorblindness-(achromatopsia)")) {
+      // do they have total colorblindness?
       is_eligible = false;
     } else if (surveyData.age18orolder === 'No') {
       // are they younger than 18?
@@ -166,11 +178,11 @@ exports.submitData = function(surveyData) {
     } else if (surveyData.headphones.length === 0) {
       // is the headphones array empty?
       is_eligible = false;
-    } else if (surveyData.keyboard_letters !== 'QWERTY') {
-      // do they have a QWERTY keyboard?
+    } else if (surveyData.computer === "No") {
+      // do they have a computer?
       is_eligible = false;
-    } else if (surveyData.keyboard_numbers === 'No') {
-      // do they have a number row at the top of their keyboard?
+    } else if (surveyData.ports.length === 0) {
+      // do they have any USB ports?
       is_eligible = false;
     }
 

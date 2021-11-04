@@ -13,13 +13,32 @@
       :labels="['English', 'other']"
     ></radio-button-question>
 
-    <p>Do you have any history of speech, language, hearing, and/or sleep disorder?</p>
+    <p>Do you have any history of speech, language, and/or hearing disorder?</p>
     <radio-button-question
-      v-model="survey_answers.disorder"
-      group-id="disorder"
+      v-model="survey_answers.lang_disorder"
+      group-id="lang_disorder"
       @error-catch="updateFormErrors"
       :labels="['Yes', 'No']"
     ></radio-button-question>
+
+    <p>Do you have any history of sleep disorder?</p>
+    <radio-button-question
+      v-model="survey_answers.sleep_disorder"
+      group-id="sleep_disorder"
+      @error-catch="updateFormErrors"
+      :labels="['Yes', 'No']"
+    ></radio-button-question>
+
+    <p>Do you have any history of colorblindness or color vision deficiency? (check all that apply)</p>
+    <checkbox-question
+      v-model="survey_answers.colorblind"
+      group-id="colorblind"
+      @error-catch="updateFormErrors"
+      :options="[
+        'I have trouble distinguishing red and green',
+        'I have trouble distinguishing blue and yellow',
+        'I have total colorblindness (achromatopisa)']"
+    ></checkbox-question>
 
     <p>Are you 18 years of age or older?</p>
     <radio-button-question
@@ -37,21 +56,22 @@
       v-model="survey_answers.headphones"
     ></checkbox-question>
 
-    <p>What are the first (leftmost) five letters on the top row of your computer keyboard?</p>
+    <p>Do you have access to a desktop or laptop computer?</p>
     <radio-button-question
-      v-model="survey_answers.keyboard_letters"
-      group-id="keyboard_letters"
-      @error-catch="updateFormErrors"
-      :labels="['QWERTY', 'QWERTZ', 'AZERTY']"
+      v-model="survey_answers.computer"
+      group-id="computer"
     ></radio-button-question>
 
-    <p>Does your computer keyboard have a row of numbers at the top?</p>
-    <radio-button-question
-      v-model="survey_answers.keyboard_numbers"
-      group-id="keyboard_numbers"
-      @error-catch="updateFormErrors"
-      :labels="['Yes', 'No']"
-    ></radio-button-question>
+    <p>Which of the following ports do you have on your computer(s)? (check all that apply)</p>
+    <checkbox-question
+      v-model="survey_answers.ports"
+      group-id="ports"
+      :options="['USB Type A (most common USB port)', 'USB Type C (MacBook)']"
+      :exampleImgs="[
+        'usb-a.jpeg',
+        'usb-c.jpeg'
+      ]"
+    ></checkbox-question>
 
     <h2>Availability</h2>
 
@@ -140,9 +160,9 @@ export default {
         this.survey_answers.available == null ||
         this.survey_answers.age18orolder == null ||
         this.survey_answers.native_lang == null ||
-        this.survey_answers.disorder == null ||
-        this.survey_answers.keyboard_letters == null ||
-        this.survey_answers.keyboard_numbers == null
+        this.survey_answers.lang_disorder == null ||
+        this.survey_answers.sleep_disorder == null ||
+        this.survey_answers.computer == null
       ) {
         this.perfectFormState = false
       } else {

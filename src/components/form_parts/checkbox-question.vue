@@ -1,21 +1,24 @@
 <template>
   <div class="checkboxes option-list">
     <span
-      v-for="option in options"
-      v-bind:key="option | regularize"
-      :class = "displayedValues.includes(option)? 'selected-option' : '' "
+      v-for="n in Array(options.length).keys()"
+      v-bind:key="options[n] | regularize"
+      :class = "displayedValues.includes($options.filters.regularize(options[n]))? 'selected-option' : '' "
     >
       <input type="checkbox"
-        v-bind:value="option"
-        v-bind:checked="displayedValues.includes(option)"
-        v-bind:id="option | regularize"
+        v-bind:value="options[n] | regularize"
+        v-bind:checked="displayedValues.includes(options[n])"
+        v-bind:id="options[n] | regularize"
         v-on:change="updateAppState"
         v-bind:disabled="unclickable === true"
       />&nbsp;
       <label
-        v-bind:for="option | regularize"
-        v-bind:key="option | regularize"
-      >{{ option }}</label>
+        v-bind:for="options[n] | regularize"
+        v-bind:key="options[n] | regularize"
+      >
+      <span>{{ options[n] }}</span>
+      <img v-if="exampleImgs.length > 0" class="example-img" :src="require('@/assets/'+exampleImgs[n])" />
+    </label>
     </span>
   </div>
 </template>
@@ -47,6 +50,12 @@ export default {
     unclickable: {
       type: Boolean,
       default: false
+    },
+    exampleImgs: {
+      type: Array,
+      default: function() {
+        return []
+      }
     }
   },
   data: function() {
@@ -56,8 +65,8 @@ export default {
   },
   filters: {
     regularize: function (value) {
-      value = value.replace(" ", "-")
-      value = value.replace(".", "")
+      value = value.replaceAll(" ", "-")
+      value = value.replaceAll(".", "")
 
       return (value)
 
