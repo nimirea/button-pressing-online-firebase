@@ -63,12 +63,14 @@ let getAvailableTimeslots = function (include_dropoffs = true) {
             endTime: date_utils.parseISOLocal(events_list[cal_event].end['dateTime'])
           }
           blockInfo.dayOfWeek = blockInfo.startTime.getDay() // 1 for Monday, 5 for Friday
-          blockInfo.week = date_utils.getWeek(blockInfo.startTime)
           if (events_list[cal_event].summary.includes("pickup")) {
             blockInfo.eventType = "pickup"
           } else if (events_list[cal_event].summary.includes("dropoff")) {
             blockInfo.eventType = "dropoff"
           }
+          // calculate block group
+          blockInfo.group = Math.floor(cal_event / 2);
+          console.log(blockInfo.group);
 
           if (include_dropoffs === true || blockInfo.eventType === "pickup") {
 
@@ -78,10 +80,10 @@ let getAvailableTimeslots = function (include_dropoffs = true) {
 
               slotInfo = {
                 dayOfWeek: weekdays[blockInfo.dayOfWeek],
-                week: blockInfo.week, // for filtering by appointments in same week
                 slotIdx: slot_idx,
                 offsetMins: [],
-                eventType: blockInfo.eventType
+                eventType: blockInfo.eventType, // for filtering by appointments in the same "group"
+                group: blockInfo.group
               }
 
               for (var tt in time_markers) {

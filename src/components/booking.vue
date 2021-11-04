@@ -211,14 +211,14 @@ export default {
         }
       })
     },
-    filterApptOptions: function(desired_eventType, desired_week) {
+    filterApptOptions: function(desired_eventType, desired_group) {
       let return_obj = {
         'labels': [],
         'values': []
       }
 
       this.available_timeslots.forEach((timeslot, idx) => {
-        if (timeslot.eventType === desired_eventType && (desired_week === undefined || timeslot.week == desired_week)) {
+        if (timeslot.eventType === desired_eventType && (desired_group === undefined || timeslot.group == desired_group)) {
           return_obj.labels.push(timeslot.label)
           return_obj.values.push(idx)
         }
@@ -252,7 +252,7 @@ export default {
       if (this.appointment_choices.pickup === undefined) {
         return {}
       } else {
-        return this.filterApptOptions("dropoff", this.available_timeslots[this.appointment_choices.pickup].week)
+        return this.filterApptOptions("dropoff", this.available_timeslots[this.appointment_choices.pickup].group)
       }
     }
   },
