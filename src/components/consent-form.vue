@@ -93,7 +93,7 @@
     <p>The results of this study could be shared in articles and presentations, but will not include any information that identifies you unless you give permission for use of information that identifies you in articles and presentations.</p>
 
     <h2>Will I be paid or given anything for taking part in this study?</h2>
-    <p>You will receive up to $30 in cash for your participation in this study, distributed upon return of the activity tracker. You will still receive compensation for your time even if you choose to withdraw before completing the entire {{ compensation.length }}-day study:</p>
+    <p>You will receive up to $30 in cash for your participation in this study, distributed upon return of the study equipment. You will still receive compensation for your time even if you choose to withdraw before completing the entire {{ compensation.length }}-day study:</p>
 
     <ul>
       <li v-for="(item, index) in compensation" :key="item">
