@@ -196,30 +196,20 @@ exports.submitData = function(surveyData) {
     // set participant_id
     var participant_id = "email/" + to_upload.email.replace(/\./gi, "|")
 
-    // get exp_ver if this participant already exists in the database
     return DB.ref(participant_id).once('value')
     .then(
       (snapshot_pptData) => {
         let ppt_data = snapshot_pptData.val()
         let state_set = false
-        let exp_ver_set = false
 
         if (ppt_data !== null) {
           state_set = (ppt_data.state !== undefined && ppt_data.state !== null)
-          exp_ver_set = (ppt_data.exp_ver !== undefined && ppt_data.exp_ver !== null)
         }
 
         if (state_set === false) {
           to_upload.state = "consent-form"
         } else {
           to_upload.state = ppt_data.state
-        }
-
-        if (exp_ver_set === false) {
-          // set experiment version randomly
-          to_upload.exp_ver = (Math.random() >= 0.66 ? 2 : 4);
-        } else {
-          to_upload.exp_ver = ppt_data.exp_ver
         }
 
         console.log(to_upload)
@@ -237,7 +227,6 @@ exports.submitData = function(surveyData) {
           return setters.addToWaitingList(to_upload.email)
             .then(() => {
               return {
-                'study_length': to_upload.exp_ver,
                 'is_eligible': is_eligible,
                 'waiting_list': true
               }
@@ -252,7 +241,6 @@ exports.submitData = function(surveyData) {
             to_upload.email
           ).then(() => {
             return {
-              'study_length': to_upload.exp_ver,
               'is_eligible': is_eligible,
               'waiting_list': false
             };

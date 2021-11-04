@@ -184,7 +184,7 @@ let getPptData = function getPptData(args) {
             // set random value if we need to
             args.attribute.forEach((key) => {
               if (!(orig_keys.includes(key)) && args.set_if_null === true) {
-                let new_val = init_attributes.initialize(key, result.exp_ver)
+                let new_val = init_attributes.initialize(key)
                 DB.ref(args.ppt_id + '/' + key).set(new_val)
                 result[key] = new_val
               }
@@ -205,7 +205,7 @@ let getPptData = function getPptData(args) {
           } else {
 
             if (!(args.attribute in result) && args.set_if_null === true) {
-              result = init_attributes.initialize(args.attribute, result.exp_ver)
+              result = init_attributes.initialize(args.attribute)
               DB.ref(args.ppt_id + '/' + key).set(result)
             } else {
               result = result[args.attribute]
@@ -317,22 +317,15 @@ let calcLatestStartTimeFromDropoff = function(dropoff_event, num_hours_before = 
 
     let ppt_id = event_parsed.ppt_id;
 
-    // query database for exp_ver
-    return getPptData({
-      'ppt_id': 'ppt/' + ppt_id,
-      'attribute': 'exp_ver'
-    }).then((exp_ver) => {
+    // calculate latest start time based on ppt_info
+    let latest_start_datetime_raw = date_utils.parseISOLocal(dropoff_event.start.dateTime);
+    // set it back the number of sessions required, minus one (they might do the last session on the day of)
+    latest_start_datetime_raw.setDate(latest_start_datetime_raw.getDate() - 1);
+    // subtract the number of hours that would be needed to get to campus (hypothetically... let's say 3 to be on the safe side?)
+    latest_start_datetime_raw.setHours(latest_start_datetime_raw.getHours() - num_hours_before);
 
-      // calculate latest start time based on ppt_info
-      let latest_start_datetime_raw = date_utils.parseISOLocal(dropoff_event.start.dateTime);
-      // set it back the number of sessions required, minus one (they might do the last session on the day of)
-      latest_start_datetime_raw.setDate(latest_start_datetime_raw.getDate() - (exp_ver - 1));
-      // subtract the number of hours that would be needed to get to campus (hypothetically... let's say 3 to be on the safe side?)
-      latest_start_datetime_raw.setHours(latest_start_datetime_raw.getHours() - num_hours_before);
+    return (latest_start_datetime_raw);
 
-      return (latest_start_datetime_raw);
-
-    })
   }
 
 }

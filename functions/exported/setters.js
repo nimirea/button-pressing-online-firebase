@@ -191,14 +191,13 @@ let uploadData = function(data) {
       'consent',
       'consent_version',
       'demographics',
-      'email',
-      'exp_ver'
+      'email'
     ]
 
     // if we're storing consent info, create an official (sequential) ppt_id for this person!
     return getters.getPptData({
       ppt_id: ppt_id,
-      attribute: ['exp_ver', 'email']
+      attribute: ['email']
     }).then((ppt_data) => {
 
       carryover_ppt_data = ppt_data
@@ -240,10 +239,10 @@ let uploadData = function(data) {
 
                 return getters.getPptData({
                   'ppt_id': ppt_id,
-                  'attribute': ['exp_ver', 'email', 'startedTime/' + data.day]
+                  'attribute': ['email', 'startedTime/' + data.day]
                 }).then((returned_ppt_data) => {
 
-                  if (String(returned_ppt_data.exp_ver) !== String(data.day)) {
+                  if (String(data.day) !== "2") {
 
                     let ppt_id_raw = ppt_id.split("/")[1];
                     let tomorrow_idx = parseInt(data.day) + 1;
@@ -319,7 +318,7 @@ let sendFirstEmail = function(data) {
     return getters.getPptData(
       {
         ppt_id: 'ppt/' + data.participant_id,
-        attribute: ["email", "exp_ver"]
+        attribute: ["email"]
       }
     ).then((rpd) => {
 
@@ -352,10 +351,7 @@ let sendFirstEmail = function(data) {
         dropoff_datetime_raw = date_utils.parseISOLocal(dropoff_item.start.dateTime);
         latest_start_datetime_raw = await getters.calcLatestStartTimeFromDropoff(dropoff_item);
 
-        let tst = "all " + returned_ppt_data.exp_ver
-        if (returned_ppt_data.exp_ver === 2) {
-          tst = "both"
-        }
+        let tst = "both"
 
         return mail.send_as_template(
           "Experiment Session Link (Day 1)",

@@ -302,17 +302,8 @@ export default {
           returned_obj['count'] = ppt_list.filter(ppt => ppt['exp_cond'] == exp_cond_def['db_name']).length
         }
 
-        // pull from exp_ver if we can
         if (returned_obj['count'] == 0) {
-          if (returned_obj['official_name'].includes('language-')) {
-            if (returned_obj['official_name'].includes('-dissimilar')) {
-              returned_obj['count'] = ppt_list.filter(ppt => ppt['exp_ver'] == 4).length
-            } else {
-              returned_obj['count'] = ppt_list.filter(ppt => ppt['exp_ver'] == 2).length
-            }
-          } else {
-            returned_obj['count'] = 'not set yet'
-          }
+          returned_obj['count'] = 'not set yet'
         }
 
         return returned_obj

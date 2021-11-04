@@ -45,10 +45,8 @@ export default {
       'loading_ppt': false,
       'received_ppt_data': null,
       'compensation': [
-        7,
-        9,
-        11,
-        13
+        13,
+        17
       ]
     }
   },
@@ -94,9 +92,6 @@ export default {
     calcCashEarned: function(ppt_data) {
       // calculate cash earned according to schedule
       let compensation_sched = this.compensation;
-      if (ppt_data.exp_ver == 2) {
-        compensation_sched = [compensation_sched[0], compensation_sched[compensation_sched.length - 1]]
-      }
 
       // how many of these have they actually done?
       let num_sessions_done = 0

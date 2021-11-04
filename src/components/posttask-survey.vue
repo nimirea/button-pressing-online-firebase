@@ -61,7 +61,7 @@
 
   <button v-on:click="submitSurvey" v-if="perfectFormState === true">
     submit survey to
-    <span v-if="day != exp_ver">receive tomorrow's link</span>
+    <span v-if="day != 2">receive tomorrow's link</span>
     <span v-else>continue</span>
   </button>
   <button v-else class="unclickable">
@@ -82,7 +82,7 @@ import loadingView from './loading-view.vue'
 
 export default {
   name: 'post-task-survey',
-  props: ['pptId', 'day', 'exp_ver'],
+  props: ['pptId', 'day'],
   components: {
     radioButtonQuestion,
     textboxQuestion,

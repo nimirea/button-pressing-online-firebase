@@ -305,7 +305,6 @@
     <post-task-survey
       :ppt-id='participant_id'
       :day='day'
-      :exp_ver='exp_ver'
       @submit='stopTask'>
     </post-task-survey>
     </div>
@@ -313,7 +312,7 @@
     <!-- experiment over -->
     <div v-if="expOver">
       <p>Your response has been successfully submitted!</p>
-      <p v-if="day != exp_ver">You will receive an email shortly with a link to tomorrow's session. Please click the link after {{ timeRemainingString }}, and be sure to get a full night's sleep (while wearing your Fitbit) before your next session.</p>
+      <p v-if="day != 2">You will receive an email shortly with a link to tomorrow's session. Please click the link after {{ timeRemainingString }}, and be sure to get a full night's sleep (while wearing your Fitbit) before your next session.</p>
       <p v-else>Thank you for your participation in this experiment! We look forward to seeing you at your equipment drop-off appointment.</p>
     </div>
   </div>
@@ -407,7 +406,6 @@ export default {
       recordingDDK: false, // whether DDK task is recording
       participant_id: null,
       exp_cond: null, // experiment condition (onset, coda-onset, or coda-coda)
-      exp_ver : null, // set based on length of experiment (given in URI): 4 for long version, null otherwise
       cb_cond: null, // counterbalancing condition
       exp_length: null, // experiment length, will depend on URL parameter
       surveySubmitted: false, // whether ending survey has been submitted or not
@@ -847,13 +845,12 @@ export default {
       var gpc = fb_functions.httpsCallable('getPptData');
       gpc({
         ppt_id: 'ppt/' + this.participant_id,
-        attribute: ['exp_cond', 'cb_cond', 'exp_ver'],
+        attribute: ['exp_cond', 'cb_cond'],
         set_if_null: true
       }).then((res) => {
 
           this.exp_cond = res.data.exp_cond;
           this.cb_cond = res.data.cb_cond;
-          this.exp_ver = res.data.exp_ver;
 
           // adjust compensation based on assigned condition
           this.compensation = this.compensation.slice(0, this.exp_cond.split("-").length * 2);

@@ -144,7 +144,6 @@ export default {
   },
   data: function() {
     return {
-      permissions: [],
       compensation: [13, 17],
       given_data: {},
       uploading: false,
@@ -160,20 +159,12 @@ export default {
       return this.uploadData({
         'participant_id': this.pptId,
         'consent': 'now',
-        'permissions': this.permissions,
         'state': "appointment-booking",
         'consent_version': this.consent_version
       }).then((new_ppt_info) => {
         self.uploading = false;
         self.$emit('finished', new_ppt_info.data.ppt_id, true)
       })
-    },
-    useExpVer: function(exp_ver) {
-      if (exp_ver === 2) {
-        this.compensation = [7, 13]
-      } else if (exp_ver == 4) {
-        this.compensation = [7, 9, 11, 13]
-      }
     }
   },
   filters: {
@@ -192,25 +183,10 @@ export default {
     var get_data = fb_functions.httpsCallable('getPptData');
 
     // not a record, but a form
-    if (this.record === false) {
-      get_data({ppt_id: this.pptId, attribute: 'exp_ver'}).then((res) => {
-        let exp_ver = res.data
-        this.useExpVer(exp_ver);
-      });
-
-    // record mode
-    } else {
-      get_data({ppt_id: this.pptId, attribute: ['exp_ver', 'consent', 'permissions', 'consent_version']}).then((res) => {
+    if (this.record !== false) {
+      get_data({ppt_id: this.pptId, attribute: ['consent', 'permissions', 'consent_version']}).then((res) => {
         // store results
         this.given_data = res.data;
-
-        // use experiment version
-        this.useExpVer(this.given_data.exp_ver);
-
-        // change to default consent version
-        if ('consent_version' in res.data === false) {
-          this.consent_version = 4;
-        }
 
       });
     }

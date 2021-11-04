@@ -156,14 +156,7 @@ let startTaskReminder = function(item) {
 
               latest_start_datetime_raw = lsdr
 
-              return getters.getPptData(
-                {
-                  'ppt_id': 'ppt/' + ppt_info.ppt_id,
-                  'attribute': 'exp_ver'
-                })
-            }).then((exp_ver) => {
-
-              let maxCompensation = exp_ver * 10
+              let maxCompensation = 30
 
               return mail.send_as_template(
                 "Tongue-Twister Study Reminder",

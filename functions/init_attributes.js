@@ -5,7 +5,7 @@ function pick_random(array) {
 
 let options = {
   'cb_cond': ["AE->F; IH->S", "AE->S; IH->F"],
-  'exp_cond': ["onset-coda", "onset-onset"]
+  'exp_cond': ["onset", "coda"]
 }
 
 function init_randomly(attribute_name) {
@@ -14,12 +14,8 @@ function init_randomly(attribute_name) {
 
 // initializer for each attribute that shouldn't just be picked randomly from options
 let initializers = {
-  'exp_cond': function(exp_ver) {
-    if (exp_ver === 2) {
-      return "coda"
-    } else {
-      return init_randomly('exp_cond')
-    }
+  'exp_cond': function() {
+    return init_randomly('exp_cond')
   }
 }
 
