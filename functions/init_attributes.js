@@ -4,7 +4,36 @@ function pick_random(array) {
 }
 
 let options = {
-  'cb_cond': ["AE->F; IH->S", "AE->S; IH->F"],
+  'cb_cond': ['thumb-R->index-L; thumb-L->index-R',
+    'thumb-R->index-L; thumb-L->middle-L',
+    'thumb-R->index-L; thumb-L->middle-R',
+    'thumb-R->index-L; thumb-L->ring-L',
+    'thumb-R->index-L; thumb-L->ring-R',
+    'thumb-R->index-R; thumb-L->index-L',
+    'thumb-R->index-R; thumb-L->middle-L',
+    'thumb-R->index-R; thumb-L->middle-R',
+    'thumb-R->index-R; thumb-L->ring-L',
+    'thumb-R->index-R; thumb-L->ring-R',
+    'thumb-R->middle-L; thumb-L->index-L',
+    'thumb-R->middle-L; thumb-L->index-R',
+    'thumb-R->middle-L; thumb-L->middle-R',
+    'thumb-R->middle-L; thumb-L->ring-L',
+    'thumb-R->middle-L; thumb-L->ring-R',
+    'thumb-R->middle-R; thumb-L->index-L',
+    'thumb-R->middle-R; thumb-L->index-R',
+    'thumb-R->middle-R; thumb-L->middle-L',
+    'thumb-R->middle-R; thumb-L->ring-L',
+    'thumb-R->middle-R; thumb-L->ring-R',
+    'thumb-R->ring-L; thumb-L->index-L',
+    'thumb-R->ring-L; thumb-L->index-R',
+    'thumb-R->ring-L; thumb-L->middle-L',
+    'thumb-R->ring-L; thumb-L->middle-R',
+    'thumb-R->ring-L; thumb-L->ring-R',
+    'thumb-R->ring-R; thumb-L->index-L',
+    'thumb-R->ring-R; thumb-L->index-R',
+    'thumb-R->ring-R; thumb-L->middle-L',
+    'thumb-R->ring-R; thumb-L->middle-R',
+    'thumb-R->ring-R; thumb-L->ring-L'],
   'exp_cond': ["onset", "coda"]
 }
 
@@ -14,9 +43,6 @@ function init_randomly(attribute_name) {
 
 // initializer for each attribute that shouldn't just be picked randomly from options
 let initializers = {
-  'exp_cond': function() {
-    return init_randomly('exp_cond')
-  }
 }
 
 exports.initialize = function(attribute_name, argument = null) {
