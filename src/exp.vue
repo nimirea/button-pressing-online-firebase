@@ -360,18 +360,6 @@ export default {
       rejected: false, // declined to participate
       trialEnded: false, // TT task
       expOver: false,
-      numerals: [ // used for language in the consent form
-        'first',
-        'second',
-        'third',
-        'fourth'
-      ],
-      compensation: [
-        7,
-        9,
-        11,
-        13
-      ],
       taskList: [ // tasks, in order
         {
           name: 'mic_check',
@@ -813,47 +801,51 @@ export default {
       // determine whether participant has arrived at the right time,
       // based on whether they've
       var ccs = fb_functions.httpsCallable('calcCompletionStatus');
-      ccs({
-        'participant_id': this.participant_id,
-        'day': this.day
-      }).then((res) => {
-        this.prevDayIncomplete = res.data.prevDayIncomplete;
-        this.alreadyDone = res.data.alreadyDone;
+        ccs({
+          'participant_id': this.participant_id,
+          'day': this.day
+        }).then((res) => {
 
-        if (this.alreadyDone === false) {
-          if (this.day != 1) {
-
-            this.updateTimeRemaining(this.day - 1, () => {
-
-              // update timingCorrect dynamically
-              if (this.minsRemaining > 0) {
-                this.timingCorrect = "early";
-              } else {
-                this.timingCorrect = "just right";
-              }
-
-            });
-
+          if (this.test_mode === true && res.data === null) {
+            this.prevDayIncomplete = false;
+            this.alreadyDone = false;
           } else {
-            this.timingCorrect = "just right";
+            this.prevDayIncomplete = res.data.prevDayIncomplete;
+            this.alreadyDone = res.data.alreadyDone;
           }
-        }
 
-      })
+          if (this.alreadyDone === false) {
+            if (this.day != 1) {
+
+              this.updateTimeRemaining(this.day - 1, () => {
+
+                // update timingCorrect dynamically
+                if (this.minsRemaining > 0) {
+                  this.timingCorrect = "early";
+                } else {
+                  this.timingCorrect = "just right";
+                }
+
+              });
+
+            } else {
+              this.timingCorrect = "just right";
+            }
+          }
+
+        })
 
       // set experimental & counterbalancing conditions
       var gpc = fb_functions.httpsCallable('getPptData');
       gpc({
         ppt_id: 'ppt/' + this.participant_id,
         attribute: ['exp_cond', 'cb_cond'],
-        set_if_null: true
+        set_if_null: true,
+        add_to_db: this.test_mode
       }).then((res) => {
 
           this.exp_cond = res.data.exp_cond;
           this.cb_cond = res.data.cb_cond;
-
-          // adjust compensation based on assigned condition
-          this.compensation = this.compensation.slice(0, this.exp_cond.split("-").length * 2);
 
           // get stimuli from CSV file
           var stim_file = '/static/stimuli.csv'
@@ -867,25 +859,16 @@ export default {
               this.stimList = Papa.parse(data, {
                   'header': true,
                   'skipEmptyLines': true,
-                  'columns': ['stim_id', 'cb_cond', 'exp_cond', 'crit_cons', 'twister']
+                  'columns': ['stim_id', 'cb_cond', 'exp_cond', 'twister']
               }).data;
 
               // filter by day and conditions:
-
-              // assign critical consonant based on day of experiment
-              var cons_group_today = "";
-              if (this.day <= 2) {
-                cons_group_today = "FS";
-              } else {
-                cons_group_today = "VZ";
-              }
 
               // retrive experimental condition for this day
               var exp_cond_today = this.exp_cond.split("-")[Math.round((this.day) / 2) - 1];
               this.stimList = this.stimList.filter(item => {
 
-                return (item.crit_cons == cons_group_today
-                        && item.exp_cond == exp_cond_today
+                return (item.exp_cond == exp_cond_today
                         && item.cb_cond == this.cb_cond)
 
               });

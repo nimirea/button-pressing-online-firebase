@@ -145,6 +145,7 @@ let getBookedTimeslots = function(args) {
 // - args.attribute: string or list of strings for attribute to return
 // - ppt_id: participant ID to get the data for
 // - set_if_null: set value if null
+// - add_to_db: add participant TO the database, if they don't exist
 let getPptData = function getPptData(args) {
 
   // change ppt_id if needed
@@ -162,7 +163,20 @@ let getPptData = function getPptData(args) {
       result = snapshot.val()
 
       if (result === null ) {
-        return null
+        // participant is not in the database
+
+        // if we've been instructed to add a new participant to the database, do that here
+        if (args.add_to_db === true && args.set_if_null === true) {
+          result = {}
+          args.attribute.forEach((key) => {
+            let new_val = init_attributes.initialize(key)
+            DB.ref(args.ppt_id + '/' + key).set(new_val)
+            result[key] = new_val
+          })
+        }
+
+        return result;
+
       } else {
 
         if (ppt_id.startsWith("email/") && Object.keys(result).includes("ppt_id")) {
