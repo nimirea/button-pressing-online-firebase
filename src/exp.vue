@@ -267,10 +267,6 @@ export default {
       stq: { }, // sleep timing questionnaire
       perfectFormState: false, // checking whether the survey is valid
       errorCounts: { }, // for storing errors for each input
-      audioPermission: { // data for the survey at the beginning
-        'presentation': false,
-        'public': false
-      },
       test_mode: null, // whether to use a smaller stimulus list ('yes' = use smaller)
       timeRemainingString: null,
       minsRemaining: null,
@@ -280,7 +276,6 @@ export default {
       browserOutdated: false,
       completionURL: null,
       completionErrors: false,
-      speechRecorded: false,
       lastKey: {
         key: null,
         timestamp: null
@@ -473,7 +468,7 @@ export default {
               this.taskList[this.currentTask].sample_trials[trial_idx].played = true;
 
               if (try_along === true) {
-                this.taskList[this.currentTask].sample_trials[trial_idx].completed = this.speechRecorded;
+                // this.taskList[this.currentTask].sample_trials[trial_idx].completed = this.speechRecorded;
               }
 
             })
