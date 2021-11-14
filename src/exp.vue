@@ -65,25 +65,25 @@
 
         <p>At this time, please connect the external keyboard you were given to
           your computer's USB port, and <b>turn it upside-down</b>, so that
-          the space bar is facing <em>away</em> from you.</p>
+          the row of removed keys is closest to you, and the space bar is facing <em>away</em> from you, like so:</p>
 
-        <p>TODO: example image here</p>
+        <img src="./assets/keyboard-no-hands.jpeg" />
 
         <button
           v-on:click="taskList[currentTask].data.keyboardConnected = true; startKeyTrial();"
           v-bind:class="{
                           active: taskList[currentTask].data.keyboardConnected === true
                         }"
-        >The external keyboard is connected.</button>
+        >The external keyboard is connected and upside-down.</button>
 
       </div>
 
       <div v-if="taskList[currentTask].data.keyboardConnected == true">
 
-        <p>Please put your fingers on the keys that are covered with stickers,
-          with your fingers arranged as shown:</p>
+        <p>Please put your thumbs and all fingers except your pinkies on the keys that are covered with stickers,
+          as shown:</p>
 
-        <p>TODO: example image</p>
+        <img src="./assets/keyboard-hands.jpeg" />
 
         <p>When you are ready, please press the key beneath your <b>{{ keyTrial.key.finger }}</b>.</p>
 
