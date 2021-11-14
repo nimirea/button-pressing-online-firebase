@@ -362,7 +362,7 @@ export default {
       // record response within taskList
       this.taskList[this.currentTask].stimList[this.currentStim] = this.currentKeyTrial
 
-      if (this.currentStim < this.taskList[this.currentTask].stimList.length) {
+      if (this.currentStim < this.taskList[this.currentTask].stimList.length - 1) {
         this.startKeyTrial(this.taskList[this.currentTask].stimList[this.currentStim + 1]);
         this.currentStim += 1;
       } else {
