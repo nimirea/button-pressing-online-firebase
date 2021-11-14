@@ -21,9 +21,19 @@ p, button, li, label {
 }
 
 p.loading-dots {
-  font-size: 2rem;
+  font-size: 10rem;
   text-align: center;
   font-family: 'Roboto Slab', 'Helvetica', 'Arial', sans-serif;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -100%);
+  background-color: rgba(0,0,0, 0.5);
+  color: white;
+  z-index: 100;
+  /* padding: 2rem; */
+  padding: 0 2rem;
+  border-radius:2rem;
 }
 
 button {

@@ -32,6 +32,7 @@
     <div v-else-if="timingCorrect === 'just right'">
 
     <p class="recording-bar" v-if="isRecording">recording</p>
+    <p v-if="waitText != ''" class="loading-dots">{{ waitText }}</p>
 
     <!-- keyboard check -->
     <div v-if="!expOver & taskList[currentTask].name == 'equipment_setup'">
@@ -101,9 +102,6 @@
         </p>
 
       </div>
-
-      <p class="loading-dots">{{ waitText }}</p>
-
 
 
     </div>
@@ -262,7 +260,19 @@ export default {
           }
         },
         {
-          name: 'TT'
+          name: 'TT',
+          sample_trials: [
+            {
+              path: '/static/samples/TT-1.mp3',
+              isPlaying: false
+            },
+            {
+              path: '/static/samples/TT-2.mp3',
+              isPlaying: false,
+              played: false,
+              completed: false
+            }
+          ]
         },
         {
           name: 'survey'
@@ -294,7 +304,7 @@ export default {
       },
       currentKeyTrial: null,
       currentlyPressedKeys: [],
-      listenForThumbs: false,
+      listenForThumbs: true,
       thumbPressSecs: 2,
       waitText: "",
       thumbWaitInterval: null
@@ -400,9 +410,6 @@ export default {
         }
       }
 
-      // scroll to window bottom
-      window.scrollTo(0,document.body.scrollHeight);
-
       return;
     },
     keyFunction: function(keypress_event) {
@@ -420,6 +427,10 @@ export default {
       // if a keyTrial is happening:
       if (this.currentKeyTrial != null) {
         this.checkCurrentKeyTrial();
+
+        // scroll to window bottom
+        window.scrollTo(0,document.querySelector("#app").scrollHeight);
+
       }
 
       // if we're listening for thumbs
@@ -430,7 +441,10 @@ export default {
         ) {
           console.log("both thumbs pressed")
           let thumbResolution = 5
-          this.waitText = ".".repeat(this.thumbPressSecs * thumbResolution)
+          this.waitText = "·".repeat(this.thumbPressSecs * thumbResolution)
+
+          // scroll to window bottom
+          window.scrollTo(0,document.querySelector("#app").scrollHeight);
 
           let latest_press_time = this.lastKeypress.timestamp
           let vm = this
@@ -439,7 +453,8 @@ export default {
             function() {
               vm.waitText = vm.waitText.slice(0, -1); // remove last thing
               let current_time = new Date();
-              if (current_time - latest_press_time > vm.thumbPressSecs * 1000) {
+              let time_diff = current_time - latest_press_time
+              if (time_diff >= vm.thumbPressSecs * 1000 ) {
                 vm.stopTask();
               }
             },
@@ -471,6 +486,7 @@ export default {
     // stop task and continue to next one (or end the experiment, if we're all out of tasks)
     stopTask: function() {
 
+      clearInterval(this.thumbWaitInterval);
 
       // end the whole experiment if we're all out of tasks
       if (this.currentTask == this.taskList.length - 1) {
@@ -679,7 +695,8 @@ export default {
       window.addEventListener('keyup', (e) => {
         v.currentlyPressedKeys = v.currentlyPressedKeys.filter(k => k.key !== e.key)
         if (this.thumbWaitInterval != null) {
-          clearInterval(this.thumbWaitInterval);
+          clearInterval(v.thumbWaitInterval);
+          v.waitText = "";
         }
       });
 
