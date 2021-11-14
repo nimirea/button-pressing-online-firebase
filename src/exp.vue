@@ -87,16 +87,19 @@
 
         <img src="./assets/keyboard-hands.jpeg" />
 
-        <p v-for="(trial, index) in taskList[currentTask].stimList" :key="index">
-          <span v-if="currentStim >= index">
-            <span v-if="index == 0">
-              When you are ready, please
-            </span>
-            <span v-else>Great! Now </span>
-            press the key beneath your <b>{{ keysToFingers[trial.correct_answer] }}</b>.
+        <p v-for="(trial, index) in taskList[currentTask].stimList.slice(0, currentStim + 1)" :key="index">
+          <span v-if="index == 0">
+            When you are ready, please
           </span>
+          <span v-else>Great! Now </span>
+            press the key beneath your <b>{{ keysToFingers[trial.correct_answer] }}</b>.
         </p>
+        <p v-if="currentKeyTrial != null && currentKeyTrial.is_correct === false">That wasn't quite right... please look at the example image above and try again.</p>
 
+        <p v-if="currentKeyTrial == null && taskList[currentTask].stimList[taskList[currentTask].stimList.length - 1].is_correct == true">
+          Awesome! Looks like you're ready for the next step. Please press down on ALL stickered keys to continue.
+        </p>
+        
       </div>
 
     </div>
@@ -231,7 +234,7 @@ export default {
         'left thumb': "8",
         'right thumb': "6",
         'left index finger': "k",
-        'right index finger': "f",
+        'right index finger': "g",
         'left middle finger': ".",
         'right middle finger': "c",
         'left ring finger': "/",
@@ -433,6 +436,9 @@ export default {
       } else {
         // advance to next task
         this.currentTask += 1;
+
+        // reset Stim
+        this.currentStim = 0;
 
         // scroll to top
         window.scrollTo(0, 0);
