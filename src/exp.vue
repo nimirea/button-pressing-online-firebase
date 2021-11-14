@@ -70,7 +70,9 @@
         <img src="./assets/keyboard-no-hands.jpeg" />
 
         <button
-          v-on:click="taskList[currentTask].data.keyboardConnected = true; startKeyTrial();"
+          v-on:click="taskList[currentTask].data.keyboardConnected = true;
+            taskList[currentTask].stimList = makeKeyTrials();
+            startKeyTrial(taskList[currentTask].stimList[0]);"
           v-bind:class="{
                           active: taskList[currentTask].data.keyboardConnected === true
                         }"
@@ -85,12 +87,15 @@
 
         <img src="./assets/keyboard-hands.jpeg" />
 
-        <p>When you are ready, please press the key beneath your <b>{{ keyTrial.key.finger }}</b>.</p>
-
-        <p v-if="keyTrial.result === 'failed'">That's not quite right! Please readjust your hands according to the picture and try again.</p>
-        <div v-if="keyTrial.result === 'passed'">
-          <p>Awesome! Let's try another.</p>
-        </div>
+        <p v-for="(trial, index) in taskList[currentTask].stimList" :key="index">
+          <span v-if="currentStim >= index">
+            <span v-if="index == 0">
+              When you are ready, please
+            </span>
+            <span v-else>Great! Now </span>
+            press the key beneath your <b>{{ keysToFingers[trial.correct_answer] }}</b>.
+          </span>
+        </p>
 
       </div>
 
@@ -222,10 +227,10 @@ export default {
       stream: {},
       snd: {}, // sound to be played
       analyserNode: {}, // volume meter
-      fingerMapping: {
-        'left thumb': "6",
-        'right thumb': "8",
-        'left index finger': "j",
+      fingersToKeys: {
+        'left thumb': "8",
+        'right thumb': "6",
+        'left index finger': "k",
         'right index finger': "f",
         'left middle finger': ".",
         'right middle finger': "c",
@@ -276,19 +281,27 @@ export default {
       browserOutdated: false,
       completionURL: null,
       completionErrors: false,
-      lastKey: {
-        key: null,
-        timestamp: null
+      lastKeypress: {
+        timestamp: null,
+        key: null
       },
-      keyTrial: {
-        start: null, // when did the keytrial start?
-        key: null,
-        result: null
-      }
+      currentKeyTrial: null
     }
   },
   components: {
     postTaskSurvey
+  },
+  computed: {
+    keysToFingers: function () {
+      // `this` points to the vm instance
+      let result = {}
+
+      for (var finger in this.fingersToKeys) {
+        result[this.fingersToKeys[finger]] = finger
+      }
+
+      return result;
+    }
   },
   methods : {
     shuffle: function (array) {
@@ -312,37 +325,82 @@ export default {
 
       return array;
     },
-    getRandomKey: function() {
-      let fingers = Object.keys(this.fingerMapping);
-      let rand_idx = Math.floor(Math.random() * fingers.length);
+    makeKeyTrials: function(keys = Object.values(this.fingersToKeys), randomize = true) {
+      let result = keys.map(key => {
+        return {
+          start_time: null,
+          correct_answer: key,
+          responses: [],
+          is_correct: null,
+          wrong_tries: []
+        }
+      })
 
-      let result = {
-        'finger': fingers[rand_idx],
-        'key': this.fingerMapping[fingers[rand_idx]]
+      if (randomize == true) {
+        result = this.shuffle(result)
       }
 
       return result;
     },
-    keyFunction: function(keypress_event) {
-      // what happens when a key is pressed?
-      this.lastKey.key = keypress_event.key;
-      this.lastKey.timestamp = new Date();
+    startKeyTrial: function(keyTrial) {
+      this.currentKeyTrial = keyTrial
+      this.currentKeyTrial.start_time = new Date()
+    },
+    endKeyTrial: function() {
+      // record response within taskList
+      this.taskList[this.currentTask].stimList[this.currentStim] = this.currentKeyTrial
 
-      // if a keyTrial is happening:
-      if (this.keyTrial.key != null) {
-        if (this.lastKey.key === this.keyTrial.key.key) {
-          this.keyTrial.result = "passed"
+      if (this.currentStim < this.taskList[this.currentTask].stimList.length) {
+        this.startKeyTrial(this.taskList[this.currentTask].stimList[this.currentStim + 1]);
+        this.currentStim += 1;
+      } else {
+        this.currentKeyTrial = null;
+      }
+
+    },
+    checkCurrentKeyTrial: function() {
+      this.currentKeyTrial.responses.push(this.lastKeypress)
+
+      if (this.currentKeyTrial.responses.length == this.currentKeyTrial.correct_answer.length) {
+        // check for correctness
+        let response_together = this.currentKeyTrial.responses
+          .map((keypress) => {return keypress.key;})
+          .reduce((prev_key, current_key) => {
+            return prev_key + current_key;
+          })
+
+        console.log(response_together);
+        if (response_together === this.currentKeyTrial.correct_answer) {
+          this.currentKeyTrial.is_correct = true
+
+          // end the key trial
+          this.endKeyTrial(this.taskList[this.currentTask].keyTrialsList);
+
         } else {
-          this.keyTrial.result = "failed"
+          this.currentKeyTrial.is_correct = false
+
+          // increment wrong tries
+          this.currentKeyTrial.wrong_tries.push(this.currentKeyTrial.responses)
+
+          // clear responses array
+          this.currentKeyTrial.responses = [];
         }
       }
 
-      console.log(this.keyTrial.result);
-
+      return;
     },
-    startKeyTrial: function() {
-      this.keyTrial.key = this.getRandomKey();
-      this.keyTrial.start = new Date();
+    keyFunction: function(keypress_event) {
+      // what happens when a key is pressed?
+      this.lastKeypress.key = keypress_event.key;
+      this.lastKeypress.timestamp = new Date();
+
+      // if a keyTrial is happening:
+      if (this.currentKeyTrial != null) {
+        this.checkCurrentKeyTrial();
+      }
+
+      return;
+
     },
     uploadData: fb_functions.httpsCallable('uploadData'),
     // function that starts the experiment
