@@ -223,14 +223,14 @@ export default {
       snd: {}, // sound to be played
       analyserNode: {}, // volume meter
       fingerMapping: {
-        'left thumb': "7",
-        'right thumb': "6",
+        'left thumb': "6",
+        'right thumb': "8",
         'left index finger': "j",
         'right index finger': "f",
-        'left middle finger': ",",
-        'right middle finger': "x",
-        'left ring finger': ".",
-        'right ring finger': "z"
+        'left middle finger': ".",
+        'right middle finger': "c",
+        'left ring finger': "/",
+        'right ring finger': "x"
       },
       isStarted: false, // has the experiment started?
       isRecording: false, // are we currently recording?
