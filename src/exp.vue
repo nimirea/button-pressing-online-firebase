@@ -96,11 +96,15 @@
         </p>
         <p v-if="currentKeyTrial != null && currentKeyTrial.is_correct === false">That wasn't quite right... please look at the example image above and try again.</p>
 
-        <p v-if="currentKeyTrial == null && taskList[currentTask].stimList[taskList[currentTask].stimList.length - 1].is_correct == true">
-          Awesome! Looks like you're ready for the next step. Please press down on ALL stickered keys to continue.
+        <p v-if="taskList[currentTask].stimList[taskList[currentTask].stimList.length - 1].is_correct == true">
+          Awesome, well done! Looks like you're ready for the next step. Please press down on both thumbs for {{ thumbPressSecs }} seconds to continue.
         </p>
 
       </div>
+
+      <p class="loading-dots">{{ waitText }}</p>
+
+
 
     </div>
 
@@ -288,7 +292,12 @@ export default {
         timestamp: null,
         key: null
       },
-      currentKeyTrial: null
+      currentKeyTrial: null,
+      currentlyPressedKeys: [],
+      listenForThumbs: false,
+      thumbPressSecs: 2,
+      waitText: "",
+      thumbWaitInterval: null
     }
   },
   components: {
@@ -358,6 +367,7 @@ export default {
         this.currentStim += 1;
       } else {
         this.currentKeyTrial = null;
+        this.listenForThumbs = true;
       }
 
     },
@@ -397,12 +407,45 @@ export default {
     },
     keyFunction: function(keypress_event) {
       // what happens when a key is pressed?
+
+      // set as the last keypress
       this.lastKeypress.key = keypress_event.key;
       this.lastKeypress.timestamp = new Date();
+
+      // add to currently pressed keys
+      let lk = {};
+      Object.assign(lk, this.lastKeypress)
+      this.currentlyPressedKeys.push(lk);
 
       // if a keyTrial is happening:
       if (this.currentKeyTrial != null) {
         this.checkCurrentKeyTrial();
+      }
+
+      // if we're listening for thumbs
+      if (this.listenForThumbs == true) {
+        if (this.currentlyPressedKeys.map((k) => { return k.key }).includes(this.fingersToKeys['left thumb'])
+          && this.currentlyPressedKeys.map((k) => { return k.key }).includes(this.fingersToKeys['right thumb'])
+          && this.currentlyPressedKeys.length == 2
+        ) {
+          console.log("both thumbs pressed")
+          let thumbResolution = 5
+          this.waitText = ".".repeat(this.thumbPressSecs * thumbResolution)
+
+          let latest_press_time = this.lastKeypress.timestamp
+          let vm = this
+
+          this.thumbWaitInterval = setInterval(
+            function() {
+              vm.waitText = vm.waitText.slice(0, -1); // remove last thing
+              let current_time = new Date();
+              if (current_time - latest_press_time > vm.thumbPressSecs * 1000) {
+                vm.stopTask();
+              }
+            },
+            1000 / thumbResolution
+          )
+        }
       }
 
       return;
@@ -626,10 +669,18 @@ export default {
 
     if (this.browserOutdated === false) {
 
-      // add event listener
+      // add event listeners
       let v = this;
       window.addEventListener('keydown', (e) => {
-        v.keyFunction(e);
+        if (v.currentlyPressedKeys.map((k) => { return k.key }).includes(e.key) !== true) {
+          v.keyFunction(e);
+        }
+      });
+      window.addEventListener('keyup', (e) => {
+        v.currentlyPressedKeys = v.currentlyPressedKeys.filter(k => k.key !== e.key)
+        if (this.thumbWaitInterval != null) {
+          clearInterval(this.thumbWaitInterval);
+        }
       });
 
       // getting participant ID from URL
