@@ -99,7 +99,7 @@
         <p v-if="currentKeyTrial == null && taskList[currentTask].stimList[taskList[currentTask].stimList.length - 1].is_correct == true">
           Awesome! Looks like you're ready for the next step. Please press down on ALL stickered keys to continue.
         </p>
-        
+
       </div>
 
     </div>
@@ -389,6 +389,9 @@ export default {
           this.currentKeyTrial.responses = [];
         }
       }
+
+      // scroll to window bottom
+      window.scrollTo(0,document.body.scrollHeight);
 
       return;
     },
