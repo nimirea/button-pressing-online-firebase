@@ -171,12 +171,12 @@
             Each repetition of the sequence (3 panes with 3 presses and 1 pause each) should take 12 beats.
           </p>
 
-          <p>Press both thumbs for two seconds to see and hear an example of this.</p>
+          <p>Press both thumbs for {{ thumbPressSecs }} seconds to see and hear an example of this.</p>
 
           <div class="tableau">
             <img v-for="(pane_img, pane_idx) in breakIntoPanes(taskList[currentTask].sample_trials[0].stim)"
               :key="pane_img"
-              :src="pane_img" class="pane" :class="{ 'on-beat': pane_idx == focusedPane }"/>
+              :src="pane_img" class="pane" :class="{ 'on-beat': pane_idx == taskList[currentTask].stimList[2].focused_pane }"/>
           </div>
 
         </div>
@@ -342,8 +342,7 @@ export default {
         'i': 'index finger',
         'r': 'ring finger',
         'm': 'middle finger'
-      },
-      focusedPane: -1 // for highlighting panes
+      }
     }
   },
   components: {
@@ -443,7 +442,8 @@ export default {
           correct_answer: key,
           responses: [],
           is_correct: null,
-          wrong_tries: []
+          wrong_tries: [],
+          focused_pane: -1 // which pane is focused?
         }
       })
 
@@ -522,7 +522,7 @@ export default {
 
           let interval_id = setInterval(
             function() {
-              vm.waitText = vm.waitText.slice(0, -1); // remove last thing
+              vm.waitText = vm.waitText.slice(0, -1); // remove last dot
               let current_time = new Date();
               let time_diff = current_time - latest_press_time
               if (time_diff >= vm.thumbPressSecs * 1000 ) {
@@ -707,18 +707,7 @@ export default {
             },
 
           // when sound is loaded, go through the trial flow
-							() => {
-            // reset the frame when the sound ends
-            sampleSound.on("end", () => {
-              this.stimVisible = false;
-              this.taskList[this.currentTask].sample_trials[trial_idx].isPlaying = false;
-              this.taskList[this.currentTask].sample_trials[trial_idx].played = true;
-
-              if (try_along === true) {
-                // this.taskList[this.currentTask].sample_trials[trial_idx].completed = this.speechRecorded;
-              }
-
-            })
+						() => {
 
             this.taskList[this.currentTask].sample_trials[trial_idx].isPlaying = true;
 
@@ -726,9 +715,123 @@ export default {
               this.stimVisible = true;
             }, this.isi);
 
-            if (try_along === true) {
-              // this.record(true, true);
-            }
+            let trial_loop_interval_id = null;
+            let vm = this;
+            let taskList_stimList_idx = trial_idx + 2 // corresponds to the position of this trial in the taskList stimList, so we can keep track of which pane is focused
+
+            sampleSound.on("play", () => {
+              // let sound_start_time = new Date();
+              // count_in_s = 1;
+              // let phases = [
+              //   {
+              //     name: 'count in',
+              //     length: 4
+              //     repeat: 1
+              //   },
+              //   {
+              //     name: 'slow repetition',
+              //     subphases: [
+              //       {
+              //         name: 'focus pane',
+              //         length: 3
+              //       },
+              //       {
+              //         name: 'no focus',
+              //         length: 1
+              //       }
+              //     ],
+              //     repeat: 3
+              //   },
+              //   {
+              //     name: 'fast repetitions',
+              //     subphases: [
+              //       {
+              //         name: 'fast repetition'
+              //         subphases: [
+              //           {
+              //             name: 'focus pane',
+              //             length: 2.5
+              //           },
+              //           {
+              //             name: 'no focus',
+              //             length: 0.5
+              //           }
+              //         ],
+              //         repeat: 3
+              //       }
+              //     ],
+              //     repeat: 3
+              //   }
+              // ]
+              //
+              //
+              // s_in_ms = 1000;
+              //
+              // setTimeout(() => {
+              //
+              //
+              //
+              // }, count_in_s * s_in_ms)
+
+              // change focus depending on the beat
+              let min_timestep = 500; // fastest beats are 500ms
+              let current_step = 0;
+              let slow_beats = 1000;
+              let keys_in_pane = 3;
+              let panes_in_tableau = 3;
+              let count_in_beats = 4;
+              // let n_fast_section_reps = 3;
+              let n_timesteps_slow = slow_beats / min_timestep;
+
+              trial_loop_interval_id = setInterval(() => {
+
+                let currently_focused_pane = -1
+
+                // "count-in" trials
+                if (current_step >= count_in_beats * n_timesteps_slow
+                    && current_step < (count_in_beats + panes_in_tableau * (keys_in_pane + 1)) * n_timesteps_slow) {
+
+                  // slow first repetition
+                  let slow_section_step = current_step - count_in_beats * n_timesteps_slow
+                  currently_focused_pane = parseInt(slow_section_step / (n_timesteps_slow * (keys_in_pane + 1)))
+
+                } else if (current_step >= (count_in_beats + panes_in_tableau * (keys_in_pane + 1)) * n_timesteps_slow) {
+                  // fast subsequent repetitions
+                  let fast_section_step = current_step - count_in_beats * n_timesteps_slow + panes_in_tableau * (keys_in_pane + 1) * n_timesteps_slow
+                  currently_focused_pane = parseInt(fast_section_step / (keys_in_pane + 1)) % (panes_in_tableau)
+
+                }
+                vm.taskList[this.currentTask].stimList[taskList_stimList_idx].focused_pane = currently_focused_pane
+
+                console.log("at " + current_step + " focused pane is " + currently_focused_pane )
+                current_step += 1
+
+              }, min_timestep)
+            })
+
+
+
+            // reset the frame when the sound ends
+            sampleSound.on("end", () => {
+              this.stimVisible = false;
+              this.taskList[this.currentTask].sample_trials[trial_idx].isPlaying = false;
+              this.taskList[this.currentTask].sample_trials[trial_idx].played = true;
+
+              // clear trial interval
+              clearInterval(trial_loop_interval_id)
+
+               // remove highlighting
+               this.taskList[this.currentTask].stimList[taskList_stimList_idx].focused_pane = -1
+
+              if (try_along === true) {
+                // this.taskList[this.currentTask].sample_trials[trial_idx].completed = this.speechRecorded;
+              }
+
+            })
+
+            // if (try_along === true) {
+            //   // this.record(true, true);
+            // }
 
             sampleSound.play();
 
