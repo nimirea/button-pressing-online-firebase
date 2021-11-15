@@ -56,7 +56,7 @@
       </p>
 
         <button
-          v-on:click="taskList[currentTask].data.headphonesConnected = true;"
+          v-on:click="taskList[currentTask].data.headphonesConnected = true; scrollDown();"
           v-bind:class="{
                           active: taskList[currentTask].data.headphonesConnected === true
                         }"
@@ -73,7 +73,8 @@
         <button
           v-on:click="taskList[currentTask].data.keyboardConnected = true;
             taskList[currentTask].stimList = makeKeyTrials();
-            startKeyTrial(taskList[currentTask].stimList[0]);"
+            startKeyTrial(taskList[currentTask].stimList[0]);
+            scrollDown();"
           v-bind:class="{
                           active: taskList[currentTask].data.keyboardConnected === true
                         }"
@@ -141,6 +142,18 @@
         <div class="tableau"><img class="pane" :src="breakIntoPanes(taskList[currentTask].sample_trials[0].stim)[1]" /></div>
 
         <p v-if="currentKeyTrial != null && currentKeyTrial.is_correct === false">Not quite... go ahead and start over from the beginning.</p>
+
+        <div v-if="taskList[currentTask].stimList[0].is_correct === true" class="reveal">
+          <p>Excellent!</p>
+
+          <p>Now try all the panes together, from left to right:</p>
+
+          <div class="tableau">
+            <img v-for="pane_img in breakIntoPanes(taskList[currentTask].sample_trials[0].stim)"
+              :key="pane_img"
+              :src="pane_img" class="pane"/>
+          </div>
+        </div>
 
         <!-- <p>Important notes:</p>
 
@@ -319,6 +332,12 @@ export default {
     }
   },
   methods : {
+    scrollDown: function() {
+      this.$nextTick(function () {
+        document.getElementById("app").scrollIntoView({ behavior: 'smooth' , block: 'end'});
+      })
+      return;
+    },
     breakIntoPanes: function(stim_text) {
       let result = stim_text.split(" ");
       let images = require.context('./assets/stimuli-img', false, /\.png$/);
@@ -418,32 +437,35 @@ export default {
       Object.assign(lr, this.lastKeypress)
       this.currentKeyTrial.responses.push(lr)
 
-      if (this.currentKeyTrial.responses.length == this.currentKeyTrial.correct_answer.length) {
+      let num_keys_attempted = this.currentKeyTrial.responses.length
 
-        // check for correctness
-        let response_together = this.currentKeyTrial.responses
-          .map((keypress) => {return keypress.key;})
-          .reduce((prev_key, current_key) => {
-            return prev_key + current_key;
-          })
+      // check for correct
+      if (this.currentKeyTrial.responses[num_keys_attempted - 1].key == this.currentKeyTrial.correct_answer.slice(num_keys_attempted - 1, num_keys_attempted)) {
 
-        console.log(response_together);
-        if (response_together === this.currentKeyTrial.correct_answer) {
+        // check for done
+        if (this.currentKeyTrial.responses.length === this.currentKeyTrial.correct_answer.length) {
           this.currentKeyTrial.is_correct = true
 
           // end the key trial
           this.endKeyTrial(this.taskList[this.currentTask].keyTrialsList);
 
         } else {
-          this.currentKeyTrial.is_correct = false
-
-          // increment wrong tries
-          this.currentKeyTrial.wrong_tries.push(this.currentKeyTrial.responses)
-
-          // clear responses array
-          this.currentKeyTrial.responses = [];
+          this.currentKeyTrial.is_correct = null;
         }
+
+      } else {
+        this.currentKeyTrial.is_correct = false
+
+        // increment wrong tries
+        this.currentKeyTrial.wrong_tries.push(this.currentKeyTrial.responses)
+
+        // clear responses array
+        this.currentKeyTrial.responses = [];
       }
+
+      this.$nextTick(function () {
+        this.scrollDown();
+      })
 
       return;
     },
@@ -463,10 +485,6 @@ export default {
       // if a keyTrial is happening:
       if (this.currentKeyTrial != null) {
         this.checkCurrentKeyTrial();
-
-        // scroll to window bottom
-        window.scrollTo(0,document.querySelector("#app").scrollHeight);
-
       }
 
       // if we're listening for thumbs
@@ -478,9 +496,6 @@ export default {
           console.log("both thumbs pressed")
           let thumbResolution = 5
           this.waitText = "·".repeat(this.thumbPressSecs * thumbResolution)
-
-          // scroll to window bottom
-          window.scrollTo(0,document.querySelector("#app").scrollHeight);
 
           let latest_press_time = this.lastKeypress.timestamp
           let vm = this
@@ -538,9 +553,6 @@ export default {
         // reset Stim
         this.currentStim = 0;
 
-        // scroll to top
-        window.scrollTo(0, 0);
-
         // make key trials for next task:
         if (this.taskList[this.currentTask].name == "button-pressing") {
           this.taskList[this.currentTask].stimList = this.makeKeyTrials({
@@ -551,6 +563,11 @@ export default {
             this.taskList[this.currentTask].stimList[0]
           )
         }
+
+        this.$nextTick(() => {
+          document.body.scrollIntoView({ behavior: 'auto' , block: 'start'});
+        })
+
       }
     },
 
@@ -888,7 +905,7 @@ export default {
 
         });
     }
-  }
+  },
 }
 
 </script>
