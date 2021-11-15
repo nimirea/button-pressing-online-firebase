@@ -129,7 +129,7 @@
           <li><span class="gray">gray</span></li>
         </ol>
         <p>
-          Let's zoom in on the first pane as an example. In what order should you press the colored buttons?
+          Let's zoom in on the first pane as an example. Which buttons should you press, and in what order?
         </p>
         <div class="tableau"><img class="pane" :src="breakIntoPanes(taskList[currentTask].sample_trials[0].stim)[0]" /></div>
         <ol>
@@ -143,7 +143,7 @@
 
         <p v-if="currentKeyTrial != null && currentKeyTrial.is_correct === false">Not quite... go ahead and start over from the beginning.</p>
 
-        <div v-if="taskList[currentTask].stimList[0].is_correct === true" class="reveal">
+        <div v-if="taskList[currentTask].stimList[0].is_correct === true">
           <p>Excellent!</p>
 
           <p>Now try all the panes together, from left to right:</p>
@@ -370,34 +370,42 @@ export default {
     },
     makeKeyTrials: function(params = {
       keys: Object.values(this.fingersToKeys),
-      randomize: true
+      randomize: true,
+      from_stim: false
     }) {
-      console.log(params.keys);
       let keys = params.keys;
+      let from_stim = params.from_stim;
       let randomize = params.randomize;
       let result = [];
-      if (typeof keys === 'string') {
-        let split_arr = keys.split(" ")
+
+      if (from_stim === true) {
         let chunk_size = 2
-        split_arr.map((pane) => {
-          for (let index = 0; index < pane.length; index += chunk_size) {
-            result.push(pane.slice(index, index + chunk_size))
-          }
-        })
+        for (let stim_idx = 0; stim_idx < keys.length; stim_idx += 1) {
+          console.log(keys[stim_idx])
+          let split_arr = keys[stim_idx].split(" ")
+          let keys_in_stim = []
+          split_arr.map((pane) => {
+            for (let index = 0; index < pane.length; index += chunk_size) {
+              keys_in_stim.push(pane.slice(index, index + chunk_size))
+            }
+          })
 
-        let vm = this;
-        result = [ result.map((key_abbreviation) => {
-          //return key_abbreviation[1] + " " + key_abbreviation[0];
-          return vm.fingersToKeys[
-            vm.keyAbbrevs[key_abbreviation[1]]
-            + " "
-            + vm.keyAbbrevs[key_abbreviation[0]]
-          ];
-        }).join('') ];
+          let vm = this;
+          keys_in_stim = [ keys_in_stim.map((key_abbreviation) => {
+            //return key_abbreviation[1] + " " + key_abbreviation[0];
+            return vm.fingersToKeys[
+              vm.keyAbbrevs[key_abbreviation[1]]
+              + " "
+              + vm.keyAbbrevs[key_abbreviation[0]]
+            ];
+          }).join('') ]
 
+          result.push(keys_in_stim);
+        }
       } else {
         result = keys;
       }
+      console.log(result);
 
       result = result.map((key) => {
         return {
@@ -556,8 +564,12 @@ export default {
         // make key trials for next task:
         if (this.taskList[this.currentTask].name == "button-pressing") {
           this.taskList[this.currentTask].stimList = this.makeKeyTrials({
-            keys: this.taskList[this.currentTask].sample_trials[0].stim.split(" ")[1],
-            randomize: false
+            keys: [
+              this.taskList[this.currentTask].sample_trials[0].stim.split(" ")[1],
+              this.taskList[this.currentTask].sample_trials[0].stim
+            ],
+            randomize: false,
+            from_stim: true
           })
           this.startKeyTrial(
             this.taskList[this.currentTask].stimList[0]
