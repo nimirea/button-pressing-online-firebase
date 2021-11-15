@@ -720,93 +720,45 @@ export default {
             let taskList_stimList_idx = trial_idx + 2 // corresponds to the position of this trial in the taskList stimList, so we can keep track of which pane is focused
 
             sampleSound.on("play", () => {
-              // let sound_start_time = new Date();
-              // count_in_s = 1;
-              // let phases = [
-              //   {
-              //     name: 'count in',
-              //     length: 4
-              //     repeat: 1
-              //   },
-              //   {
-              //     name: 'slow repetition',
-              //     subphases: [
-              //       {
-              //         name: 'focus pane',
-              //         length: 3
-              //       },
-              //       {
-              //         name: 'no focus',
-              //         length: 1
-              //       }
-              //     ],
-              //     repeat: 3
-              //   },
-              //   {
-              //     name: 'fast repetitions',
-              //     subphases: [
-              //       {
-              //         name: 'fast repetition'
-              //         subphases: [
-              //           {
-              //             name: 'focus pane',
-              //             length: 2.5
-              //           },
-              //           {
-              //             name: 'no focus',
-              //             length: 0.5
-              //           }
-              //         ],
-              //         repeat: 3
-              //       }
-              //     ],
-              //     repeat: 3
-              //   }
-              // ]
-              //
-              //
-              // s_in_ms = 1000;
-              //
-              // setTimeout(() => {
-              //
-              //
-              //
-              // }, count_in_s * s_in_ms)
+              let sound_start_time = new Date();
+              console.log("sound started playing")
 
               // change focus depending on the beat
-              let min_timestep = 500; // fastest beats are 500ms
-              let current_step = 0;
-              let slow_beats = 1000;
-              let keys_in_pane = 3;
+              let slow_s_per_pane = 4;
+              let fast_s_per_pane = 2;
+              let n_fast_reps = 3;
               let panes_in_tableau = 3;
-              let count_in_beats = 4;
-              // let n_fast_section_reps = 3;
-              let n_timesteps_slow = slow_beats / min_timestep;
+              let count_in_s = 4;
+              let ms_in_s = 1000;
+
 
               trial_loop_interval_id = setInterval(() => {
 
                 let currently_focused_pane = -1
+                let elapsed_time = (new Date()) - sound_start_time
 
-                // "count-in" trials
-                if (current_step >= count_in_beats * n_timesteps_slow
-                    && current_step < (count_in_beats + panes_in_tableau * (keys_in_pane + 1)) * n_timesteps_slow) {
+                // start assigning the focused pane
+                if (elapsed_time > count_in_s * ms_in_s) {
 
-                  // slow first repetition
-                  let slow_section_step = current_step - count_in_beats * n_timesteps_slow
-                  currently_focused_pane = parseInt(slow_section_step / (n_timesteps_slow * (keys_in_pane + 1)))
+                  if (elapsed_time < (slow_s_per_pane * panes_in_tableau + count_in_s) * ms_in_s) {
+                    // slow repetitions
+                    let elapsed_time_in_slow_reps = elapsed_time - count_in_s * ms_in_s;
+                    currently_focused_pane = parseInt((elapsed_time_in_slow_reps / ms_in_s) / slow_s_per_pane)
 
-                } else if (current_step >= (count_in_beats + panes_in_tableau * (keys_in_pane + 1)) * n_timesteps_slow) {
-                  // fast subsequent repetitions
-                  let fast_section_step = current_step - count_in_beats * n_timesteps_slow + panes_in_tableau * (keys_in_pane + 1) * n_timesteps_slow
-                  currently_focused_pane = parseInt(fast_section_step / (keys_in_pane + 1)) % (panes_in_tableau)
+                  } else if (elapsed_time < ((slow_s_per_pane + fast_s_per_pane * n_fast_reps) * panes_in_tableau + count_in_s) * ms_in_s) {
+                    // fast repetitions
+                    let elapsed_time_in_fast_reps = elapsed_time - (count_in_s + slow_s_per_pane * panes_in_tableau) * ms_in_s
+                    currently_focused_pane = parseInt(((elapsed_time_in_fast_reps / ms_in_s) % (fast_s_per_pane * panes_in_tableau)) / fast_s_per_pane)
+                  }
 
                 }
-                vm.taskList[this.currentTask].stimList[taskList_stimList_idx].focused_pane = currently_focused_pane
 
-                console.log("at " + current_step + " focused pane is " + currently_focused_pane )
-                current_step += 1
+                if (currently_focused_pane != vm.taskList[this.currentTask].stimList[taskList_stimList_idx].focused_pane) {
+                  // console.log("elapsed time is : " + elapsed_time + " | we are changing the pane to " + currently_focused_pane)
+                  vm.taskList[this.currentTask].stimList[taskList_stimList_idx].focused_pane = currently_focused_pane
+                }
 
-              }, min_timestep)
+              }, 25)
             })
 
 
