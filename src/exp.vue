@@ -141,8 +141,6 @@
         <p>Go ahead and try the second pane on your own:</p>
         <div class="tableau"><img class="pane" :src="breakIntoPanes(taskList[currentTask].sample_trials[0].stim)[1]" /></div>
 
-        <p v-if="currentKeyTrial != null && currentKeyTrial.is_correct === false">Not quite... go ahead and start over from the beginning.</p>
-
         <div v-if="taskList[currentTask].stimList[0].is_correct === true">
           <p>Great job!</p>
 
@@ -182,6 +180,8 @@
           </div>
 
         </div>
+
+        <p v-if="currentKeyTrial != null && currentKeyTrial.is_correct === false">Not quite... go ahead and start over from the beginning.</p>
 
         <!-- <p>Important notes:</p>
 
@@ -290,10 +290,12 @@ export default {
           sample_trials: [
             {
               isPlaying: false,
-              stim: "iLtLiR mLtLiR rRtLmR"
+              stim: "iLtLiR mLtLiR rRtLmR",
+              played: false,
+              completed: false
             },
             {
-              stim: "iLtLiR mLtLiR rRtLmR",
+              stim: "iRtRrL mLtRiL rLtRmR",
               isPlaying: false,
               played: false,
               completed: false
@@ -330,7 +332,6 @@ export default {
       },
       currentKeyTrial: null,
       currentlyPressedKeys: [],
-      listenForThumbs: true,
       thumbPressSecs: 2,
       waitText: "",
       thumbWaitInterval: null,
@@ -465,7 +466,6 @@ export default {
         this.currentStim += 1;
       } else {
         this.currentKeyTrial = null;
-        this.listenForThumbs = true;
       }
 
     },
@@ -507,29 +507,33 @@ export default {
       return;
     },
     checkThumbs: function(_callback) {
-      if (this.currentlyPressedKeys.map((k) => { return k.key }).includes(this.fingersToKeys['left thumb'])
-        && this.currentlyPressedKeys.map((k) => { return k.key }).includes(this.fingersToKeys['right thumb'])
-        && this.currentlyPressedKeys.length == 2
-      ) {
-        console.log("both thumbs pressed")
-        let thumbResolution = 5
-        this.waitText = "·".repeat(this.thumbPressSecs * thumbResolution)
+      // double check that _callback is a function
+      if (typeof _callback === 'function') {
+        if (this.currentlyPressedKeys.map((k) => { return k.key }).includes(this.fingersToKeys['left thumb'])
+          && this.currentlyPressedKeys.map((k) => { return k.key }).includes(this.fingersToKeys['right thumb'])
+          && this.currentlyPressedKeys.length == 2
+        ) {
+          console.log("both thumbs pressed")
+          let thumbResolution = 5
+          this.waitText = "·".repeat(this.thumbPressSecs * thumbResolution)
 
-        let latest_press_time = this.lastKeypress.timestamp
-        let vm = this
+          let latest_press_time = this.lastKeypress.timestamp
+          let vm = this
 
-        let interval_id = setInterval(
-          function() {
-            vm.waitText = vm.waitText.slice(0, -1); // remove last thing
-            let current_time = new Date();
-            let time_diff = current_time - latest_press_time
-            if (time_diff >= vm.thumbPressSecs * 1000 ) {
-              _callback();
-              clearInterval(interval_id);
-            }
-          },
-          1000 / thumbResolution
-        )
+          let interval_id = setInterval(
+            function() {
+              vm.waitText = vm.waitText.slice(0, -1); // remove last thing
+              let current_time = new Date();
+              let time_diff = current_time - latest_press_time
+              if (time_diff >= vm.thumbPressSecs * 1000 ) {
+                _callback();
+                clearInterval(interval_id);
+              }
+            },
+            1000 / thumbResolution
+          )
+        }
+
       }
     },
     keyFunction: function(keypress_event) {
@@ -551,22 +555,19 @@ export default {
       }
 
       // if we're listening for thumbs
-      if (this.listenForThumbs == true) {
-        let thumb_callback = function() {};
-        if ("stimList" in this.taskList[this.currentTask] &&
-            this.currentStim == this.taskList[this.currentTask].stimList.length - 1 &&
-            this.taskList[this.currentTask].stimList[this.taskList[this.currentTask].stimList.length - 1].is_correct == true) {
-          thumb_callback = this.stopTask;
-        } else if ("sample_trials" in this.taskList[this.currentTask]) {
-          let vm = this;
-          thumb_callback = function() {
-            return vm.sampleTrial(0);
-          };
-        }
-
-        this.checkThumbs(thumb_callback);
-
+      let thumb_callback = 0;
+      if (("stimList" in this.taskList[this.currentTask] &&
+          this.currentStim == this.taskList[this.currentTask].stimList.length - 1 &&
+          this.taskList[this.currentTask].stimList[this.taskList[this.currentTask].stimList.length - 1].is_correct == true)
+        || this.test_mode === true && this.currentTask === 0) {
+        thumb_callback = this.stopTask;
+      } else if ("sample_trials" in this.taskList[this.currentTask]) {
+        let vm = this;
+        thumb_callback = function() {
+          return vm.sampleTrial(0);
+        };
       }
+      this.checkThumbs(thumb_callback);
 
       return;
 
@@ -610,7 +611,9 @@ export default {
           this.taskList[this.currentTask].stimList = this.makeKeyTrials({
             keys: [
               this.taskList[this.currentTask].sample_trials[0].stim.split(" ")[1],
-              this.taskList[this.currentTask].sample_trials[0].stim
+              this.taskList[this.currentTask].sample_trials[0].stim,
+              this.taskList[this.currentTask].sample_trials[0].stim,
+              this.taskList[this.currentTask].sample_trials[1].stim
             ],
             randomize: false,
             from_stim: true
