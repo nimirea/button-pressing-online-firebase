@@ -171,6 +171,7 @@ button {
 .green { background-color: green; }
 .red, .failed { background-color: red; }
 .blue { background-color: blue; }
+.gray { background-color: gray; }
 .inactive { background-color: darkgray; }
 .active {
   background-color: white;
@@ -184,11 +185,11 @@ button {
   color:black;
   cursor: not-allowed;
 }
-span.red, span.blue, span.light-green {
+span.red, span.blue, span.light-green, span.gray {
   display: inline-block;
   padding: 0.25rem;
 }
-span.red, span.blue {
+span.red, span.blue, span.gray {
   color: white;
 }
 

@@ -120,36 +120,29 @@
             :src="pane_img" class="pane"/>
         </div>
         <p>
-          Within each pane, we'd like you to press the buttons in a specific order:
+          Within each pane, we'd like you to press the three colored buttons in a specific order:
         </p>
         <ol>
-          <li><span class=".red">red</span></li>
-          <li><span class=".blue">blue</span></li>
-          <li><span class=".gray">gray</span></li>
+          <li><span class="red">red</span></li>
+          <li><span class="blue">blue</span></li>
+          <li><span class="gray">gray</span></li>
         </ol>
         <p>
-          Let's zoom in on the first pane as an example:
+          Let's zoom in on the first pane as an example. In what order should you press the colored buttons?
         </p>
         <div class="tableau"><img class="pane" :src="breakIntoPanes(taskList[currentTask].sample_trials[0].stim)[0]" /></div>
-        <ul>
-          <li>Since the <b>left index finger</b> key is <span class=".red">red</span>, that one should be pressed first.</li>
-          <li>The <b>left thumb</b> is <span class=".blue">blue</span>, so that one should be pressed second.</li>
-          <li>The <b>right index finger</b> is <span class=".gray">gray</span>, so that one should be pressed last.</li>
-        </ul>
+        <ol>
+          <li><span class="red">red</span>: <b>left index finger</b></li>
+          <li><span class="blue">blue</span>: <b>left thumb</b></li>
+          <li><span class="gray">gray</span>: <b>right index finger</b></li>
+        </ol>
 
+        <p>Go ahead and try the second pane on your own:</p>
+        <div class="tableau"><img class="pane" :src="breakIntoPanes(taskList[currentTask].sample_trials[0].stim)[1]" /></div>
 
-        <button v-on:click="sampleTrial(0)" v-bind:class="{ unclickable: taskList[currentTask].sample_trials[0].isPlaying }">&#9658; play example</button>
-        <div class="example-trial">
-          <div class="stim">
-            <p v-if="taskList[currentTask].sample_trials[0].isPlaying && stimVisible">ghib ting pin hid</p>
-            <p v-else>
-              <img src="./assets/fixcross.png" alt="Fixation cross" class="fixcross"/>
-            </p>
-            <button class="invisible"></button>
-          </div>
-        </div>
+        <p v-if="currentKeyTrial != null && currentKeyTrial.is_correct === false">Not quite... go ahead and start over from the beginning.</p>
 
-        <p>Important notes:</p>
+        <!-- <p>Important notes:</p>
 
         <ul>
           <li>
@@ -162,39 +155,13 @@
           </li>
         </ul>
 
-        <div v-if="day === 1">
-
-          <p>Here's another example; try saying this tongue-twister aloud at the same time as the sample speaker. (This practice trial will not be stored.)</p>
-
-          <button v-on:click="sampleTrial(1, true)" v-bind:class="{ unclickable: taskList[currentTask].sample_trials[1].isPlaying }">
-            <span class="rec-symbols">&#x25cf;</span> record practice trial
-          </button>
-          <div class="example-trial">
-            <div class="stim">
-              <p v-if="taskList[currentTask].sample_trials[1].isPlaying && stimVisible">bap nak tam gad</p>
-              <p v-else>
-                <img src="./assets/fixcross.png" alt="Fixation cross" class="fixcross"/>
-              </p>
-              <button class="invisible"></button>
-            </div>
-          </div>
-
-          <div v-if="taskList[currentTask].sample_trials[1].played === true && taskList[currentTask].sample_trials[1].completed === false">
-            <p>Sorry, we didn't hear you that time. Please try recording the practice trial again.</p>
-          </div>
-          <div v-else-if="taskList[currentTask].sample_trials[1].played === true && taskList[currentTask].sample_trials[1].completed === true">
-            <p>Looks like you're ready to continue!</p>
-          </div>
-
-        </div>
-
         <div v-if="day > 1 || (taskList[currentTask].sample_trials[1].played === true && taskList[currentTask].sample_trials[1].completed === true)">
           <p>
-            This task should last approximately {{ stimList.length * .25 }}
+            This task should last approximately {{ stimList.length * .5 }}
             minutes. Your recordings will be stored and uploaded for analysis.
           </p>
           <button v-on:click="startTask">start experiment (recording will begin automatically)</button>
-        </div>
+        </div> -->
       </div>
 
       <div v-if="isStarted" class="stim">
@@ -325,7 +292,15 @@ export default {
       listenForThumbs: true,
       thumbPressSecs: 2,
       waitText: "",
-      thumbWaitInterval: null
+      thumbWaitInterval: null,
+      keyAbbrevs: {
+        'R': 'right',
+        'L': 'left',
+        't': 'thumb',
+        'i': 'index finger',
+        'r': 'ring finger',
+        'm': 'middle finger'
+      }
     }
   },
   components: {
@@ -374,8 +349,38 @@ export default {
 
       return array;
     },
-    makeKeyTrials: function(keys = Object.values(this.fingersToKeys), randomize = true) {
-      let result = keys.map(key => {
+    makeKeyTrials: function(params = {
+      keys: Object.values(this.fingersToKeys),
+      randomize: true
+    }) {
+      console.log(params.keys);
+      let keys = params.keys;
+      let randomize = params.randomize;
+      let result = [];
+      if (typeof keys === 'string') {
+        let split_arr = keys.split(" ")
+        let chunk_size = 2
+        split_arr.map((pane) => {
+          for (let index = 0; index < pane.length; index += chunk_size) {
+            result.push(pane.slice(index, index + chunk_size))
+          }
+        })
+
+        let vm = this;
+        result = [ result.map((key_abbreviation) => {
+          //return key_abbreviation[1] + " " + key_abbreviation[0];
+          return vm.fingersToKeys[
+            vm.keyAbbrevs[key_abbreviation[1]]
+            + " "
+            + vm.keyAbbrevs[key_abbreviation[0]]
+          ];
+        }).join('') ];
+
+      } else {
+        result = keys;
+      }
+
+      result = result.map((key) => {
         return {
           start_time: null,
           correct_answer: key,
@@ -409,9 +414,12 @@ export default {
 
     },
     checkCurrentKeyTrial: function() {
-      this.currentKeyTrial.responses.push(this.lastKeypress)
+      let lr = {};
+      Object.assign(lr, this.lastKeypress)
+      this.currentKeyTrial.responses.push(lr)
 
       if (this.currentKeyTrial.responses.length == this.currentKeyTrial.correct_answer.length) {
+
         // check for correctness
         let response_together = this.currentKeyTrial.responses
           .map((keypress) => {return keypress.key;})
@@ -441,6 +449,7 @@ export default {
     },
     keyFunction: function(keypress_event) {
       // what happens when a key is pressed?
+      console.log(keypress_event.key);
 
       // set as the last keypress
       this.lastKeypress.key = keypress_event.key;
@@ -531,6 +540,17 @@ export default {
 
         // scroll to top
         window.scrollTo(0, 0);
+
+        // make key trials for next task:
+        if (this.taskList[this.currentTask].name == "button-pressing") {
+          this.taskList[this.currentTask].stimList = this.makeKeyTrials({
+            keys: this.taskList[this.currentTask].sample_trials[0].stim.split(" ")[1],
+            randomize: false
+          })
+          this.startKeyTrial(
+            this.taskList[this.currentTask].stimList[0]
+          )
+        }
       }
     },
 
