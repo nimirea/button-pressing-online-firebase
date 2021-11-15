@@ -107,19 +107,37 @@
     </div>
 
     <!-- main experiment flow (tongue-twisters) -->
-    <div v-if="!expOver && taskList[currentTask].name == 'TT'">
+    <div v-if="!expOver && taskList[currentTask].name == 'button-pressing'">
       <div v-if="!isStarted">
-        <h1>Task {{currentTask + 1}} of {{taskList.length}}: Tongue-Twister Task</h1>
+        <h1>Task {{currentTask + 1}} of {{taskList.length}}: Button-Pressing Task</h1>
         <p>
-          We will now ask you to read some tongue-twisters to the beat of a
-          metronome. First,  you will hear a low "get ready" beep, then a tongue twister
-          will appear on the screen with a higher "get set" beep. On the next beep after
-          the tongue-twister appears, please begin
-          reading the tongue-twister aloud, one word per beat. After four beats (1
-          repetition of the tongue-twister), the metronome will speed up for the next
-          3 repetitions. Click the button below to hear/see
-          an example trial for the tongue-twister "ghib ting pin hid":
+          In this experiment, we will be asking you to key in sequences of nine
+          buttons in a specific order. Each sequence will appear as a set of three panes, like below:
         </p>
+        <div class="tableau">
+          <img v-for="pane_img in breakIntoPanes(taskList[currentTask].sample_trials[0].stim)"
+            :key="pane_img"
+            :src="pane_img" class="pane"/>
+        </div>
+        <p>
+          Within each pane, we'd like you to press the buttons in a specific order:
+        </p>
+        <ol>
+          <li><span class=".red">red</span></li>
+          <li><span class=".blue">blue</span></li>
+          <li><span class=".gray">gray</span></li>
+        </ol>
+        <p>
+          Let's zoom in on the first pane as an example:
+        </p>
+        <div class="tableau"><img class="pane" :src="breakIntoPanes(taskList[currentTask].sample_trials[0].stim)[0]" /></div>
+        <ul>
+          <li>Since the <b>left index finger</b> key is <span class=".red">red</span>, that one should be pressed first.</li>
+          <li>The <b>left thumb</b> is <span class=".blue">blue</span>, so that one should be pressed second.</li>
+          <li>The <b>right index finger</b> is <span class=".gray">gray</span>, so that one should be pressed last.</li>
+        </ul>
+
+
         <button v-on:click="sampleTrial(0)" v-bind:class="{ unclickable: taskList[currentTask].sample_trials[0].isPlaying }">&#9658; play example</button>
         <div class="example-trial">
           <div class="stim">
@@ -244,12 +262,12 @@ export default {
       },
       isStarted: false, // has the experiment started?
       isRecording: false, // are we currently recording?
-      stimList: [{'twister': ''}], // list of stimuli for TT task
+      stimList: [{'twister': ''}], // list of stimuli for button-pressing task
       currentStim: 0, // keep track of which stimulus should be shown
       isi: 1000, // interstimulus interval, in ms
       stimVisible: false,
       rejected: false, // declined to participate
-      trialEnded: false, // TT task
+      trialEnded: false, // button-pressing task
       expOver: false,
       taskList: [ // tasks, in order
         {
@@ -260,14 +278,14 @@ export default {
           }
         },
         {
-          name: 'TT',
+          name: 'button-pressing',
           sample_trials: [
             {
-              path: '/static/samples/TT-1.mp3',
-              isPlaying: false
+              isPlaying: false,
+              stim: "iLtLiR mLtLiR rRtLmR"
             },
             {
-              path: '/static/samples/TT-2.mp3',
+              stim: "iLtLiR mLtLiR rRtLmR",
               isPlaying: false,
               played: false,
               completed: false
@@ -326,6 +344,15 @@ export default {
     }
   },
   methods : {
+    breakIntoPanes: function(stim_text) {
+      let result = stim_text.split(" ");
+      let images = require.context('./assets/stimuli-img', false, /\.png$/);
+      result = result.map((pane) => {
+        return images('./' + pane + ".png")
+      })
+
+      return result;
+    },
     shuffle: function (array) {
       // Knuth shuffle (in-place)
       // from: https://stackoverflow.com/a/2450976
@@ -811,7 +838,7 @@ export default {
                     this.stimList = null;
 
                     // remove experimental task from taskList
-                    this.taskList = this.taskList.filter(item => item.name != "TT");
+                    this.taskList = this.taskList.filter(item => item.name != "button-pressing");
 
 
                   } else {

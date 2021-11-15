@@ -64,6 +64,7 @@ button {
   top:-2.5rem;
   z-index: -1;
 }
+
 .stim {
   position: fixed;
   top: 50%;
@@ -73,6 +74,7 @@ button {
 .stim p, .stim button {
   font-size:2rem;
 }
+
 .example-trial > .stim {
   position: inherit;
   top: 2rem;
@@ -82,6 +84,23 @@ button {
 .fixcross {
   vertical-align: middle;
   height: 2rem;
+}
+
+/* button-pressing stimuli */
+.tableau {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-content: space-between;
+  gap: 1.5rem;
+}
+.pane {
+  max-width: 33%;
+  outline: 1px solid black;
+  border: 3px solid white;
+}
+.on-beat {
+  box-shadow: 0 0 1rem 0.75rem yellow;
 }
 
 .rec-symbols {
