@@ -144,7 +144,7 @@
         <p v-if="currentKeyTrial != null && currentKeyTrial.is_correct === false">Not quite... go ahead and start over from the beginning.</p>
 
         <div v-if="taskList[currentTask].stimList[0].is_correct === true">
-          <p>Excellent!</p>
+          <p>Great job!</p>
 
           <p>Now try all the panes together, from left to right:</p>
 
@@ -153,6 +153,34 @@
               :key="pane_img"
               :src="pane_img" class="pane"/>
           </div>
+        </div>
+
+        <div v-if="taskList[currentTask].stimList[1].is_correct === true">
+          <p>Excellent! This is how sequences will be displayed in the experiment.</p>
+
+          <p>
+            In the experiment, we'll ask you to key in each sequence four times, to the beat of a metronome.
+          </p>
+
+          <p>
+            On each trial, after four "count-in" beats, the metronome will play
+            for one repetition of the sequence slowly, and then three times fast.
+            Each pane will be highlighted with a yellow border when it's time to key it in.
+          </p>
+
+          <p>
+            While the pane is highlighted, please press each key in order on the three low beats, and pause between panes on the high beats.
+            Each repetition of the sequence (3 panes with 3 presses and 1 pause each) should take 12 beats.
+          </p>
+
+          <p>Press both thumbs for two seconds to see and hear an example of this.</p>
+
+          <div class="tableau">
+            <img v-for="(pane_img, pane_idx) in breakIntoPanes(taskList[currentTask].sample_trials[0].stim)"
+              :key="pane_img"
+              :src="pane_img" class="pane" :class="{ 'on-beat': pane_idx == focusedPane }"/>
+          </div>
+
         </div>
 
         <!-- <p>Important notes:</p>
@@ -313,7 +341,8 @@ export default {
         'i': 'index finger',
         'r': 'ring finger',
         'm': 'middle finger'
-      }
+      },
+      focusedPane: -1 // for highlighting panes
     }
   },
   components: {
@@ -477,6 +506,32 @@ export default {
 
       return;
     },
+    checkThumbs: function(_callback) {
+      if (this.currentlyPressedKeys.map((k) => { return k.key }).includes(this.fingersToKeys['left thumb'])
+        && this.currentlyPressedKeys.map((k) => { return k.key }).includes(this.fingersToKeys['right thumb'])
+        && this.currentlyPressedKeys.length == 2
+      ) {
+        console.log("both thumbs pressed")
+        let thumbResolution = 5
+        this.waitText = "·".repeat(this.thumbPressSecs * thumbResolution)
+
+        let latest_press_time = this.lastKeypress.timestamp
+        let vm = this
+
+        let interval_id = setInterval(
+          function() {
+            vm.waitText = vm.waitText.slice(0, -1); // remove last thing
+            let current_time = new Date();
+            let time_diff = current_time - latest_press_time
+            if (time_diff >= vm.thumbPressSecs * 1000 ) {
+              _callback();
+              clearInterval(interval_id);
+            }
+          },
+          1000 / thumbResolution
+        )
+      }
+    },
     keyFunction: function(keypress_event) {
       // what happens when a key is pressed?
       // console.log(keypress_event.key);
@@ -497,29 +552,20 @@ export default {
 
       // if we're listening for thumbs
       if (this.listenForThumbs == true) {
-        if (this.currentlyPressedKeys.map((k) => { return k.key }).includes(this.fingersToKeys['left thumb'])
-          && this.currentlyPressedKeys.map((k) => { return k.key }).includes(this.fingersToKeys['right thumb'])
-          && this.currentlyPressedKeys.length == 2
-        ) {
-          console.log("both thumbs pressed")
-          let thumbResolution = 5
-          this.waitText = "·".repeat(this.thumbPressSecs * thumbResolution)
-
-          let latest_press_time = this.lastKeypress.timestamp
-          let vm = this
-
-          this.thumbWaitInterval = setInterval(
-            function() {
-              vm.waitText = vm.waitText.slice(0, -1); // remove last thing
-              let current_time = new Date();
-              let time_diff = current_time - latest_press_time
-              if (time_diff >= vm.thumbPressSecs * 1000 ) {
-                vm.stopTask();
-              }
-            },
-            1000 / thumbResolution
-          )
+        let thumb_callback = function() {};
+        if ("stimList" in this.taskList[this.currentTask] &&
+            this.currentStim == this.taskList[this.currentTask].stimList.length - 1 &&
+            this.taskList[this.currentTask].stimList[this.taskList[this.currentTask].stimList.length - 1].is_correct == true) {
+          thumb_callback = this.stopTask;
+        } else if ("sample_trials" in this.taskList[this.currentTask]) {
+          let vm = this;
+          thumb_callback = function() {
+            return vm.sampleTrial(0);
+          };
         }
+
+        this.checkThumbs(thumb_callback);
+
       }
 
       return;
@@ -544,8 +590,6 @@ export default {
 
     // stop task and continue to next one (or end the experiment, if we're all out of tasks)
     stopTask: function() {
-
-      clearInterval(this.thumbWaitInterval);
 
       // end the whole experiment if we're all out of tasks
       if (this.currentTask == this.taskList.length - 1) {
@@ -622,7 +666,6 @@ export default {
 					() => {
           // set what to do after the sound ends
           this.snd.on("end", () => setTimeout(() => {
-            this.stopRecording();
 
             // go to next item, if it exists
             if (this.currentStim < this.stimList.length - 1) {
@@ -664,7 +707,6 @@ export default {
 							() => {
             // reset the frame when the sound ends
             sampleSound.on("end", () => {
-              this.stopRecording(false);
               this.stimVisible = false;
               this.taskList[this.currentTask].sample_trials[trial_idx].isPlaying = false;
               this.taskList[this.currentTask].sample_trials[trial_idx].played = true;
@@ -682,7 +724,7 @@ export default {
             }, this.isi);
 
             if (try_along === true) {
-              this.record(true, true);
+              // this.record(true, true);
             }
 
             sampleSound.play();
