@@ -391,14 +391,14 @@ export default {
           })
 
           let vm = this;
-          keys_in_stim = [ keys_in_stim.map((key_abbreviation) => {
+          keys_in_stim = keys_in_stim.map((key_abbreviation) => {
             //return key_abbreviation[1] + " " + key_abbreviation[0];
             return vm.fingersToKeys[
               vm.keyAbbrevs[key_abbreviation[1]]
               + " "
               + vm.keyAbbrevs[key_abbreviation[0]]
             ];
-          }).join('') ]
+          }).join('')
 
           result.push(keys_in_stim);
         }
@@ -479,7 +479,7 @@ export default {
     },
     keyFunction: function(keypress_event) {
       // what happens when a key is pressed?
-      console.log(keypress_event.key);
+      // console.log(keypress_event.key);
 
       // set as the last keypress
       this.lastKeypress.key = keypress_event.key;
