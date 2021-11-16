@@ -178,7 +178,7 @@
           <p>Press both thumbs for {{ thumbPressSecs }} seconds to see and hear an example of this, with explanations below the frame.</p>
 
           <div class="example-trial">
-            <div v-if="taskList[currentTask].sample_trials[0].isPlaying === false" class="stim">
+            <div v-if="taskList[currentTask].sample_trials[0].isPlaying === false && currentStim === 2" class="stim">
               <img src="./assets/fixcross.png" alt="Fixation cross" class="fixcross"/>
             </div>
             <div v-else class="tableau">
@@ -192,7 +192,7 @@
         </div>
 
         <div v-if="taskList[currentTask].sample_trials[0].played === true">
-          <p>Now it's your turn. Press any key to start the sample trial.</p>
+          <p>Now it's your turn. Press both thumbs for {{ thumbPressSecs }} seconds to start the sample trial.</p>
 
           <div class="example-trial">
             <div v-if="taskList[currentTask].sample_trials[0].isPlaying === false" class="stim">
@@ -201,7 +201,7 @@
             <div v-else class="tableau">
               <img v-for="(pane_img, pane_idx) in breakIntoPanes(taskList[currentTask].sample_trials[0].stim)"
                 :key="pane_img"
-                :src="pane_img" class="pane" :class="{ 'on-beat': pane_idx == taskList[currentTask].stimList[2].focused_pane }"/>
+                :src="pane_img" class="pane" :class="{ 'on-beat': pane_idx == taskList[currentTask].stimList[3].focused_pane }"/>
             </div>
           </div>
 
@@ -209,7 +209,8 @@
 
         <p v-if="currentKeyTrial != null && currentKeyTrial.is_correct === false">Not quite... go ahead and start over from the beginning.</p>
 
-        <!-- <p>Important notes:</p>
+        <div v-if="taskList[currentTask].stimList[3].is_correct === true">
+        <p>Important notes:</p>
 
         <ul>
           <li>
@@ -217,18 +218,18 @@
             mistake, DO <b>NOT</b> go back to correct yourself.
           </li>
           <li>
-            Please perform this task <b>with your headphones on</b>. You can replay the example trial above and adjust your
+            Please perform this task <b>with your headphones on</b>. Feel free to adjust your
             volume to make sure you can comfortably hear the metronome.
           </li>
         </ul>
 
-        <div v-if="day > 1 || (taskList[currentTask].sample_trials[1].played === true && taskList[currentTask].sample_trials[1].completed === true)">
           <p>
             This task should last approximately {{ stimList.length * .5 }}
-            minutes. Your recordings will be stored and uploaded for analysis.
+            minutes. Your keystrokes will be stored and uploaded for analysis.
           </p>
-          <button v-on:click="startTask">start experiment (recording will begin automatically)</button>
-        </div> -->
+
+          <p>Press both thumbs for {{ thumbPressSecs }} seconds to continue.</p>
+        </div>
       </div>
 
       <div v-if="isStarted" class="stim">
@@ -534,6 +535,11 @@ export default {
         }
       }
 
+      // // check for timing
+      // if (this.currentKeyTrial.error_checking.includes("timing")) {
+      //
+      // }
+
       this.$nextTick(function () {
         this.scrollDown();
       })
@@ -590,16 +596,23 @@ export default {
 
       // if we're listening for thumbs
       let thumb_callback = 0;
-      if (("stimList" in this.taskList[this.currentTask] &&
+      if ((("stimList" in this.taskList[this.currentTask] &&
           this.currentStim == this.taskList[this.currentTask].stimList.length - 1 &&
-          this.taskList[this.currentTask].stimList[this.taskList[this.currentTask].stimList.length - 1].is_correct == true)
-        || this.test_mode === true && this.currentTask === 0) {
+          this.taskList[this.currentTask].stimList[this.taskList[this.currentTask].stimList.length - 1].is_correct == true) ||
+          this.test_mode === true) &&
+          this.currentTask === 0) {
+
         thumb_callback = this.stopTask;
       } else if ("sample_trials" in this.taskList[this.currentTask]) {
-        let vm = this;
-        thumb_callback = function() {
-          return vm.sampleTrial(0);
-        };
+
+        if ( this.taskList[this.currentTask].stimList[this.taskList[this.currentTask].stimList.length - 1].is_correct == true ) {
+          thumb_callback = this.startTask;
+        } else {
+          let vm = this;
+          thumb_callback = function() {
+            return vm.sampleTrial(0, vm.taskList[vm.currentTask].sample_trials[0].played);
+          };
+        }
       }
       this.checkThumbs(thumb_callback);
 
@@ -609,6 +622,8 @@ export default {
     uploadData: fb_functions.httpsCallable('uploadData'),
     // function that starts the experiment
     startTask: function(){
+
+      this.isStarted = true;
 
         // upload timestamp
         this.uploadData({
@@ -654,20 +669,11 @@ export default {
             this.makeKeyTrials({
               keys: [
                 this.taskList[this.currentTask].sample_trials[0].stim,
+                this.taskList[this.currentTask].sample_trials[0].stim
               ],
               randomize: false,
               from_stim: true,
               error_checking: []
-            })
-          ).concat(
-            this.makeKeyTrials({
-              keys: [
-                this.taskList[this.currentTask].sample_trials[0].stim,
-                this.taskList[this.currentTask].sample_trials[1].stim
-              ],
-              randomize: false,
-              from_stim: true,
-              error_checking: ['keys', 'timing']
             })
           )
           this.startKeyTrial(
@@ -770,6 +776,10 @@ export default {
             let trial_loop_interval_id = null;
             let vm = this;
             let taskList_stimList_idx = trial_idx + 2 // corresponds to the position of this trial in the taskList stimList, so we can keep track of which pane is focused
+            if (try_along === true) {
+              taskList_stimList_idx += 1;
+            }
+
             vm.taskList[this.currentTask].stimList[taskList_stimList_idx].instruction_text = "count-in (4 beats)"
 
 
