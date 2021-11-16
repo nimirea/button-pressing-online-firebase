@@ -233,14 +233,15 @@
       </div>
 
       <div v-if="isStarted" class="stim">
-        <p v-if="!trialEnded && stimVisible">
-            {{ stimList[currentStim]['twister'] }}
-        </p>
-        <p v-else>
+        <div v-if="!trialEnded && stimVisible" class="tableau">
+          <img v-for="(pane_img, pane_idx) in breakIntoPanes(stimList[currentStim]['twister'])"
+            :key="pane_img"
+            :src="pane_img" class="pane" :class="{ 'on-beat': pane_idx == taskList[currentTask].stimList[3].focused_pane }"/>
+        </div>
+        <div v-else>
           <img src="./assets/fixcross.png" alt="Fixation cross" class="fixcross"/>
-        </p>
-        <button v-on:click="nextTrial" v-if="trialEnded">next</button>
-        <button v-else class="invisible"></button>
+        </div>
+        <p v-if="trialEnded">press both thumbs for {{ thumbPressSecs }} seconds to continue</p>
       </div>
     </div>
 
@@ -357,6 +358,7 @@ export default {
         timestamp: null,
         key: null
       },
+      keypress_stimlist: [],
       currentKeyTrial: null,
       currentlyPressedKeys: [],
       thumbPressSecs: 2,
@@ -598,8 +600,7 @@ export default {
       let thumb_callback = 0;
       if ((("stimList" in this.taskList[this.currentTask] &&
           this.currentStim == this.taskList[this.currentTask].stimList.length - 1 &&
-          this.taskList[this.currentTask].stimList[this.taskList[this.currentTask].stimList.length - 1].is_correct == true) ||
-          this.test_mode === true) &&
+          this.taskList[this.currentTask].stimList[this.taskList[this.currentTask].stimList.length - 1].is_correct == true)) &&
           this.currentTask === 0) {
 
         thumb_callback = this.stopTask;
@@ -607,6 +608,8 @@ export default {
 
         if ( this.taskList[this.currentTask].stimList[this.taskList[this.currentTask].stimList.length - 1].is_correct == true ) {
           thumb_callback = this.startTask;
+        } else if (this.trialEnded === true && this.isStarted === true) {
+          thumb_callback = this.nextTrial;
         } else {
           let vm = this;
           thumb_callback = function() {
@@ -624,6 +627,19 @@ export default {
     startTask: function(){
 
       this.isStarted = true;
+      this.currentStim = 0; // reset stim counter
+
+      // create keypress list
+      this.keypress_stimlist = this.makeKeyTrials(
+        {
+          keys: this.stimList.map((item) => {
+            return item.twister;
+          }),
+          randomize: false,
+          from_stim: true,
+          error_checking: []
+        }
+      )
 
         // upload timestamp
         this.uploadData({
@@ -725,8 +741,78 @@ export default {
 
         // when sound is loaded...
 					() => {
+
+          let vm = this;
+          let trial_loop_interval_id = null;
+
+          this.snd.on("play", () => {
+            let sound_start_time = new Date();
+
+            // change focus depending on the beat
+            let slow_s_per_pane = 4;
+            let fast_s_per_pane = 2;
+            let n_fast_reps = 3;
+            let panes_in_tableau = 3;
+            let keys_per_pane = 3;
+            let count_in_s = 4;
+            let ms_in_s = 1000;
+
+
+            trial_loop_interval_id = setInterval(() => {
+
+              let currently_focused_pane = -1
+              let elapsed_time = (new Date()) - sound_start_time
+
+              // start assigning the focused pane
+              if (elapsed_time > count_in_s * ms_in_s) {
+
+                if (elapsed_time < (slow_s_per_pane * panes_in_tableau + count_in_s) * ms_in_s) {
+                  // slow repetitions
+                  let elapsed_time_in_slow_reps = elapsed_time - count_in_s * ms_in_s;
+                  currently_focused_pane = parseInt((elapsed_time_in_slow_reps / ms_in_s) / slow_s_per_pane)
+
+                  let beat = parseInt((elapsed_time_in_slow_reps / ms_in_s) % (keys_per_pane + 1))
+                  // let key_color = ""
+                  // if (beat == 0) {
+                  //   key_color = "red"
+                  // } else if (beat == 1) {
+                  //   key_color = "blue"
+                  // } else if (beat == 2) {
+                  //   key_color = "gray"
+                  // }
+
+                  if ( beat == keys_per_pane ) {
+                    currently_focused_pane = -1;
+                  }
+
+                } else if (elapsed_time < ((slow_s_per_pane + fast_s_per_pane * n_fast_reps) * panes_in_tableau + count_in_s) * ms_in_s) {
+                  // fast repetitions
+                  let elapsed_time_in_fast_reps = elapsed_time - (count_in_s + slow_s_per_pane * panes_in_tableau) * ms_in_s
+                  currently_focused_pane = parseInt(((elapsed_time_in_fast_reps / ms_in_s) % (fast_s_per_pane * panes_in_tableau)) / fast_s_per_pane)
+
+                  let beat = parseInt((elapsed_time_in_fast_reps / ms_in_s) * fast_s_per_pane % (keys_per_pane + 1))
+
+                  if ( beat == keys_per_pane ) {
+                    currently_focused_pane = -1;
+                  }
+
+                }
+
+              }
+
+              if (currently_focused_pane != vm.keypress_stimlist[vm.currentStim].focused_pane) {
+                // console.log("elapsed time is : " + elapsed_time + " | we are changing the pane to " + currently_focused_pane)
+                vm.keypress_stimlist[vm.currentStim].focused_pane = currently_focused_pane
+              }
+
+            }, 25)
+          })
+
           // set what to do after the sound ends
           this.snd.on("end", () => setTimeout(() => {
+
+            // stop trial loop
+            clearInterval(trial_loop_interval_id)
 
             // go to next item, if it exists
             if (this.currentStim < this.stimList.length - 1) {
