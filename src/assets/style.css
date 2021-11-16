@@ -53,16 +53,18 @@ button {
   text-align: center;
 }
 .example-trial {
-  max-width: 75%;
-  height: 20rem;
+  height: 16rem;
   border: 1px solid black;
   margin: 0 auto;
   display: flex;
   align-items: center;
   justify-content: center;
   position:relative;
-  top:-2.5rem;
   z-index: -1;
+}
+
+.instruction-text {
+  text-align:center;
 }
 
 .stim {
@@ -77,7 +79,7 @@ button {
 
 .example-trial > .stim {
   position: inherit;
-  top: 2rem;
+  top: 0;
   left: 0;
   transform: translate(0,0);
 }
@@ -95,9 +97,10 @@ button {
   gap: 1.5rem;
 }
 .pane {
-  max-width: 33%;
+  max-width: 28%;
   outline: 1px solid black;
   border: 3px solid white;
+  z-index: 50;
 }
 .on-beat {
   box-shadow: 0 0 1rem 0.75rem yellow;

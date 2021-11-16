@@ -115,10 +115,13 @@
           In this experiment, we will be asking you to key in sequences of nine
           buttons in a specific order. Each sequence will appear as a set of three panes, like below:
         </p>
-        <div class="tableau">
-          <img v-for="pane_img in breakIntoPanes(taskList[currentTask].sample_trials[0].stim)"
-            :key="pane_img"
-            :src="pane_img" class="pane"/>
+
+        <div class="example-trial">
+          <div class="tableau">
+            <img v-for="pane_img in breakIntoPanes(taskList[currentTask].sample_trials[0].stim)"
+              :key="pane_img"
+              :src="pane_img" class="pane"/>
+          </div>
         </div>
         <p>
           Within each pane, we'd like you to press the three colored buttons in a specific order:
@@ -145,11 +148,12 @@
           <p>Great job!</p>
 
           <p>Now try all the panes together, from left to right:</p>
-
-          <div class="tableau">
-            <img v-for="pane_img in breakIntoPanes(taskList[currentTask].sample_trials[0].stim)"
-              :key="pane_img"
-              :src="pane_img" class="pane"/>
+          <div class="example-trial">
+            <div class="tableau">
+              <img v-for="pane_img in breakIntoPanes(taskList[currentTask].sample_trials[0].stim)"
+                :key="pane_img"
+                :src="pane_img" class="pane"/>
+            </div>
           </div>
         </div>
 
@@ -171,12 +175,34 @@
             Each repetition of the sequence (3 panes with 3 presses and 1 pause each) should take 12 beats.
           </p>
 
-          <p>Press both thumbs for {{ thumbPressSecs }} seconds to see and hear an example of this.</p>
+          <p>Press both thumbs for {{ thumbPressSecs }} seconds to see and hear an example of this, with explanations below the frame.</p>
 
-          <div class="tableau">
-            <img v-for="(pane_img, pane_idx) in breakIntoPanes(taskList[currentTask].sample_trials[0].stim)"
-              :key="pane_img"
-              :src="pane_img" class="pane" :class="{ 'on-beat': pane_idx == taskList[currentTask].stimList[2].focused_pane }"/>
+          <div class="example-trial">
+            <div v-if="taskList[currentTask].sample_trials[0].isPlaying === false" class="stim">
+              <img src="./assets/fixcross.png" alt="Fixation cross" class="fixcross"/>
+            </div>
+            <div v-else class="tableau">
+              <img v-for="(pane_img, pane_idx) in breakIntoPanes(taskList[currentTask].sample_trials[0].stim)"
+                :key="pane_img"
+                :src="pane_img" class="pane" :class="{ 'on-beat': pane_idx == taskList[currentTask].stimList[2].focused_pane }"/>
+            </div>
+          </div>
+          <p class="instruction-text">{{ taskList[currentTask].stimList[2].instruction_text }}</p>
+
+        </div>
+
+        <div v-if="taskList[currentTask].sample_trials[0].played === true">
+          <p>Now it's your turn. Press any key to start the sample trial.</p>
+
+          <div class="example-trial">
+            <div v-if="taskList[currentTask].sample_trials[0].isPlaying === false" class="stim">
+              <img src="./assets/fixcross.png" alt="Fixation cross" class="fixcross"/>
+            </div>
+            <div v-else class="tableau">
+              <img v-for="(pane_img, pane_idx) in breakIntoPanes(taskList[currentTask].sample_trials[0].stim)"
+                :key="pane_img"
+                :src="pane_img" class="pane" :class="{ 'on-beat': pane_idx == taskList[currentTask].stimList[2].focused_pane }"/>
+            </div>
           </div>
 
         </div>
@@ -400,7 +426,8 @@ export default {
     makeKeyTrials: function(params = {
       keys: Object.values(this.fingersToKeys),
       randomize: true,
-      from_stim: false
+      from_stim: false,
+      error_checking: ['keys']
     }) {
       let keys = params.keys;
       let from_stim = params.from_stim;
@@ -434,7 +461,6 @@ export default {
       } else {
         result = keys;
       }
-      console.log(result);
 
       result = result.map((key) => {
         return {
@@ -443,6 +469,7 @@ export default {
           responses: [],
           is_correct: null,
           wrong_tries: [],
+          error_checking: params.error_checking,
           focused_pane: -1 // which pane is focused?
         }
       })
@@ -461,6 +488,11 @@ export default {
       // record response within taskList
       this.taskList[this.currentTask].stimList[this.currentStim] = this.currentKeyTrial
 
+      // set as correct if there's no error checking
+      if (this.taskList[this.currentTask].stimList[this.currentStim].error_checking.length == 0) {
+        this.taskList[this.currentTask].stimList[this.currentStim].is_correct = true;
+      }
+
       if (this.currentStim < this.taskList[this.currentTask].stimList.length - 1) {
         this.startKeyTrial(this.taskList[this.currentTask].stimList[this.currentStim + 1]);
         this.currentStim += 1;
@@ -476,28 +508,30 @@ export default {
 
       let num_keys_attempted = this.currentKeyTrial.responses.length
 
-      // check for correct
-      if (this.currentKeyTrial.responses[num_keys_attempted - 1].key == this.currentKeyTrial.correct_answer.slice(num_keys_attempted - 1, num_keys_attempted)) {
+      // check for correctness
+      if (this.currentKeyTrial.error_checking.includes("keys")) {
+        if (this.currentKeyTrial.responses[num_keys_attempted - 1].key == this.currentKeyTrial.correct_answer.slice(num_keys_attempted - 1, num_keys_attempted)) {
 
-        // check for done
-        if (this.currentKeyTrial.responses.length === this.currentKeyTrial.correct_answer.length) {
-          this.currentKeyTrial.is_correct = true
+          // check for done
+          if (this.currentKeyTrial.responses.length === this.currentKeyTrial.correct_answer.length) {
+            this.currentKeyTrial.is_correct = true
 
-          // end the key trial
-          this.endKeyTrial(this.taskList[this.currentTask].keyTrialsList);
+            // end the key trial
+            this.endKeyTrial(this.taskList[this.currentTask].keyTrialsList);
+
+          } else {
+            this.currentKeyTrial.is_correct = null;
+          }
 
         } else {
-          this.currentKeyTrial.is_correct = null;
+          this.currentKeyTrial.is_correct = false
+
+          // increment wrong tries
+          this.currentKeyTrial.wrong_tries.push(this.currentKeyTrial.responses)
+
+          // clear responses array
+          this.currentKeyTrial.responses = [];
         }
-
-      } else {
-        this.currentKeyTrial.is_correct = false
-
-        // increment wrong tries
-        this.currentKeyTrial.wrong_tries.push(this.currentKeyTrial.responses)
-
-        // clear responses array
-        this.currentKeyTrial.responses = [];
       }
 
       this.$nextTick(function () {
@@ -612,12 +646,30 @@ export default {
             keys: [
               this.taskList[this.currentTask].sample_trials[0].stim.split(" ")[1],
               this.taskList[this.currentTask].sample_trials[0].stim,
-              this.taskList[this.currentTask].sample_trials[0].stim,
-              this.taskList[this.currentTask].sample_trials[1].stim
             ],
             randomize: false,
-            from_stim: true
-          })
+            from_stim: true,
+            error_checking: ['keys']
+          }).concat(
+            this.makeKeyTrials({
+              keys: [
+                this.taskList[this.currentTask].sample_trials[0].stim,
+              ],
+              randomize: false,
+              from_stim: true,
+              error_checking: []
+            })
+          ).concat(
+            this.makeKeyTrials({
+              keys: [
+                this.taskList[this.currentTask].sample_trials[0].stim,
+                this.taskList[this.currentTask].sample_trials[1].stim
+              ],
+              randomize: false,
+              from_stim: true,
+              error_checking: ['keys', 'timing']
+            })
+          )
           this.startKeyTrial(
             this.taskList[this.currentTask].stimList[0]
           )
@@ -718,16 +770,18 @@ export default {
             let trial_loop_interval_id = null;
             let vm = this;
             let taskList_stimList_idx = trial_idx + 2 // corresponds to the position of this trial in the taskList stimList, so we can keep track of which pane is focused
+            vm.taskList[this.currentTask].stimList[taskList_stimList_idx].instruction_text = "count-in (4 beats)"
+
 
             sampleSound.on("play", () => {
               let sound_start_time = new Date();
-              console.log("sound started playing")
 
               // change focus depending on the beat
               let slow_s_per_pane = 4;
               let fast_s_per_pane = 2;
               let n_fast_reps = 3;
               let panes_in_tableau = 3;
+              let keys_per_pane = 3;
               let count_in_s = 4;
               let ms_in_s = 1000;
 
@@ -736,6 +790,7 @@ export default {
 
                 let currently_focused_pane = -1
                 let elapsed_time = (new Date()) - sound_start_time
+                let current_instruction_text = "count-in (4 beats)"
 
                 // start assigning the focused pane
                 if (elapsed_time > count_in_s * ms_in_s) {
@@ -745,10 +800,35 @@ export default {
                     let elapsed_time_in_slow_reps = elapsed_time - count_in_s * ms_in_s;
                     currently_focused_pane = parseInt((elapsed_time_in_slow_reps / ms_in_s) / slow_s_per_pane)
 
+                    let beat = parseInt((elapsed_time_in_slow_reps / ms_in_s) % (keys_per_pane + 1))
+                    // let key_color = ""
+                    // if (beat == 0) {
+                    //   key_color = "red"
+                    // } else if (beat == 1) {
+                    //   key_color = "blue"
+                    // } else if (beat == 2) {
+                    //   key_color = "gray"
+                    // }
+                    current_instruction_text = "slow repetition: pane " + (currently_focused_pane + 1);
+
+                    if ( beat == keys_per_pane ) {
+                      currently_focused_pane = -1;
+                      current_instruction_text = "pause"
+                    }
+
                   } else if (elapsed_time < ((slow_s_per_pane + fast_s_per_pane * n_fast_reps) * panes_in_tableau + count_in_s) * ms_in_s) {
                     // fast repetitions
                     let elapsed_time_in_fast_reps = elapsed_time - (count_in_s + slow_s_per_pane * panes_in_tableau) * ms_in_s
                     currently_focused_pane = parseInt(((elapsed_time_in_fast_reps / ms_in_s) % (fast_s_per_pane * panes_in_tableau)) / fast_s_per_pane)
+
+                    let beat = parseInt((elapsed_time_in_fast_reps / ms_in_s) * fast_s_per_pane % (keys_per_pane + 1))
+                    current_instruction_text = "fast repetition: pane " + (currently_focused_pane + 1)
+
+                    if ( beat == keys_per_pane ) {
+                      currently_focused_pane = -1;
+                      current_instruction_text = "pause"
+                    }
+
                   }
 
                 }
@@ -756,6 +836,10 @@ export default {
                 if (currently_focused_pane != vm.taskList[this.currentTask].stimList[taskList_stimList_idx].focused_pane) {
                   // console.log("elapsed time is : " + elapsed_time + " | we are changing the pane to " + currently_focused_pane)
                   vm.taskList[this.currentTask].stimList[taskList_stimList_idx].focused_pane = currently_focused_pane
+                }
+
+                if (current_instruction_text != vm.taskList[this.currentTask].stimList[taskList_stimList_idx].instruction_text) {
+                  vm.taskList[this.currentTask].stimList[taskList_stimList_idx].instruction_text = current_instruction_text
                 }
 
               }, 25)
@@ -772,8 +856,12 @@ export default {
               // clear trial interval
               clearInterval(trial_loop_interval_id)
 
-               // remove highlighting
-               this.taskList[this.currentTask].stimList[taskList_stimList_idx].focused_pane = -1
+              // remove highlighting
+              this.taskList[this.currentTask].stimList[taskList_stimList_idx].focused_pane = -1
+              vm.taskList[this.currentTask].stimList[taskList_stimList_idx].instruction_text = ""
+
+              // finish trial
+              this.endKeyTrial()
 
               if (try_along === true) {
                 // this.taskList[this.currentTask].sample_trials[trial_idx].completed = this.speechRecorded;
