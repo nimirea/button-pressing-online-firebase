@@ -232,11 +232,12 @@
         </div>
       </div>
 
+      <!-- actual trials -->
       <div v-if="isStarted" class="stim">
         <div v-if="!trialEnded && stimVisible" class="tableau">
           <img v-for="(pane_img, pane_idx) in breakIntoPanes(stimList[currentStim]['twister'])"
             :key="pane_img"
-            :src="pane_img" class="pane" :class="{ 'on-beat': pane_idx == taskList[currentTask].stimList[3].focused_pane }"/>
+            :src="pane_img" class="pane" :class="{ 'on-beat': pane_idx == keypress_stimlist[currentStim].focused_pane }"/>
         </div>
         <div v-else>
           <img src="./assets/fixcross.png" alt="Fixation cross" class="fixcross"/>
@@ -291,10 +292,10 @@ export default {
         'right thumb': "6",
         'left index finger': "k",
         'right index finger': "g",
-        'left middle finger': ".",
-        'right middle finger': "c",
-        'left ring finger': "/",
-        'right ring finger': "x"
+        'left middle finger': ",",
+        'right middle finger': "v",
+        'left ring finger': ".",
+        'right ring finger': "c"
       },
       isStarted: false, // has the experiment started?
       isRecording: false, // are we currently recording?
