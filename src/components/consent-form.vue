@@ -24,7 +24,7 @@
     <ul>
       <li>The purpose of this study is to learn more about how people learn to speak words and phrases in a new language.</li>
       <li>This research study will take place across <b>2 days</b> with a 1 hour experimental session on each day.</li>
-      <li>You will be asked press a sequence of keys on a keyboard during each experimental session, and to wear an activity tracker on your wrist during each night of the study.</li>
+      <li>You will be asked press a sequence of keys on the provided keyboard during each experimental session, and to wear an activity tracker on your wrist during each night of the study.</li>
       <li>The primary potential risk of participation is frustration with the button-pressing task; to counteract this, you will be able to take breaks during experimental sessions.</li>
       <li>The main benefit of being in this study is helping scientists better understand language learning.</li>
     </ul>
@@ -55,8 +55,8 @@
 
     <p>Each session will have 3 parts:</p>
     <ol>
-      <li>You will first be asked to test out your keyboard, to make sure that your hands are in the correct position.</li>
-      <li>Then, you will be asked to put on headphones and press keys on your keyboard for about 50 minutes.</li>
+      <li>You will first be asked to test out the keyboard we provided, to make sure that your hands are in the correct position.</li>
+      <li>Then, you will be asked to put on headphones and press keys on the provided keyboard for about 50 minutes.</li>
       <li>Finally, you will be asked to complete a post-task survey about your equipment and your sleep habits.</li>
     </ol>
     <p>After completing the post-task survey on each day, you will be asked to complete the next day’s session of this study 24 hours later, after a full night of sleep, during which you should wear the activity tracker. The next day’s session link will be emailed to you after you have completed the previous day’s session, but before 24 hours have elapsed.</p>
