@@ -262,7 +262,7 @@ export default {
           completionCondition: {
             sequence: ['left ring finger', 'left middle finger', 'left index finger', 'left thumb', 'right thumb', 'right index finger', 'right middle finger', 'right ring finger'],
             simultaneous: false,
-            text: 'You\'ll be keeping your fingers in the same position for the duration of the experiment.</p><p>To continue, please press each finger on the stickered keys one by one, from left to right (starting with your left ring finger and ending with your right ring finger).'
+            text: 'You\'ll be keeping your fingers in the same position for the duration of the experiment.</p><p>To continue, please press all 8 fingers on the stickered keys one by one, from left to right (starting with your left ring finger and ending with your right ring finger).'
           }
         },
         {
