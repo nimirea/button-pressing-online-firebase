@@ -12,10 +12,11 @@
     v-else-if="tableau.playable === true"
     :example="true"
     :stim-ref="tableau.stimRef"
+    @done="trial_played = true"
   ></trial>
 
-  <p v-if="completionCondition.sequence.length > 0" v-html="completionCondition.text"></p>
-  <button v-else v-html="completionCondition.text" @click="complete"></button>
+  <p v-if="completionCondition.sequence.length > 0 && (tableau.playable !== true || trial_played === true)" v-html="completionCondition.text"></p>
+  <button v-if="completionCondition.sequence.length == 0" v-html="completionCondition.text" @click="complete"></button>
 
   <p v-if="error_made" v-html="'<b>' + errorMessage + '</b>'"></p>
 </div>
@@ -51,7 +52,8 @@ export default {
   data: () => {
     return {
       error_made: false,
-      keys_pressed: []
+      keys_pressed: [],
+      trial_played: false
     }
   },
   methods: {

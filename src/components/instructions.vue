@@ -331,7 +331,7 @@ export default {
           }
         },
         {
-          text: ["The instructions outside the box will NOT appear in the actual experiment."],
+          text: [""],
           tableau: {
             stimRef: "iLtLiR mLtLiR rRtLmR",
             playable: true
@@ -339,7 +339,7 @@ export default {
           completionCondition: {
             sequence: ['left thumb', 'right thumb'],
             simultaneous: true,
-            text: "When you're ready to continue and try another sample trial for yourself with the metronome, press both thumbs. The trial will start automatically."
+            text: "When you're ready to continue and try a different sample trial for yourself with the metronome, press both thumbs. The trial will start automatically."
           }
         },
         {

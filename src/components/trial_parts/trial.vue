@@ -1,4 +1,5 @@
 <template>
+<div>
 <div :class="{ 'example-trial': example }">
   <!-- fixation cross -->
   <div v-if="display_tableau === false" class="stim">
@@ -9,6 +10,8 @@
     :stim-ref="stimRef"
     :focused-pane="focused_pane"
   ></tableau>
+</div>
+<p v-if="example" v-html="current_instructions"></p>
 </div>
 </template>
 <script>
@@ -55,9 +58,9 @@ export default {
       type: Number,
       default: 3
     },
-    n_keys_per_pane: {
-      type: Number,
-      default: 3
+    keys_in_pane: { // color of keys in pane
+      type: Array,
+      default: () => { return ['red', 'blue', 'gray'] }
     }
   },
   components: {
@@ -70,7 +73,8 @@ export default {
       playing: false,
       metronome: null,
       isi: 1000, // interstimulus interval, in ms
-      n_panes: 0
+      n_panes: 0,
+      current_instructions: ""
     }
   },
   methods: {
@@ -133,44 +137,48 @@ export default {
       this.focused_pane = 0;
       this.move_focus(
         this.n_panes * this.n_slow_reps,
-        this.ms_per_slow_pane / (this.n_keys_per_pane + 1)
+        this.ms_per_slow_pane / (this.keys_in_pane.length + 1)
       )
 
       // delayed intervals (fast)
       setTimeout(() => {
         this.move_focus(
           this.n_panes * this.n_fast_reps,
-          this.ms_per_fast_pane / (this.n_keys_per_pane + 1)
+          this.ms_per_fast_pane / (this.keys_in_pane.length + 1)
         );
       }, this.n_panes * this.n_slow_reps * this.ms_per_slow_pane)
     },
     move_focus: function(maximum_panes, frequency) {
-      let counter = 0;
+      let counter = -1;
       let interval_id = null;
       let vm = this;
 
       let shift_focus = function() {
-        if (counter < maximum_panes * (vm.n_keys_per_pane + 1)) {
-          counter++;
-          if (counter % (vm.n_keys_per_pane + 1) == 3) {
-            vm.focused_pane = -1;
+        counter++;
+        console.log(counter)
+
+        if (counter < maximum_panes * (vm.keys_in_pane.length + 1) - 1) {
+          if (counter % (vm.keys_in_pane.length + 1) !== vm.keys_in_pane.length) {
+              vm.current_instructions = vm.keys_in_pane[counter % (vm.keys_in_pane.length + 1)]
+              console.log(vm.current_instructions + " " + counter);
+              vm.focused_pane = Math.floor(counter / (vm.keys_in_pane.length + 1)) % vm.n_panes;
           } else {
-            vm.focused_pane = Math.floor(counter / (vm.n_keys_per_pane + 1)) % vm.n_panes;
+            vm.focused_pane = -1;
+            vm.current_instructions = ""
           }
         } else {
           // self-destruct
           vm.focused_pane = -1;
+          vm.current_instructions = ""
           clearInterval(interval_id);
         }
       }
 
+      shift_focus();
       interval_id = setInterval(
         shift_focus,
         frequency
       )
-
-      return;
-
     }
   },
   created: function() {
