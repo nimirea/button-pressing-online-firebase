@@ -4,7 +4,15 @@
 
   <img v-if="image != ''" :src="require('@/assets/'+image)" />
 
-  <tableau v-if="tableau != ''" :stim-ref="tableau"></tableau>
+  <tableau
+    v-if="Object.keys(tableau).length !== 0 && tableau.playable === false"
+    :stim-ref="tableau.stimRef"
+  ></tableau>
+  <trial
+    v-else-if="tableau.playable === true"
+    :example="true"
+    :stim-ref="tableau.stimRef"
+  ></trial>
 
   <p v-if="completionCondition.sequence.length > 0" v-html="completionCondition.text"></p>
   <button v-else v-html="completionCondition.text" @click="complete"></button>
@@ -14,6 +22,8 @@
 </template>
 <script>
 import tableau from '../trial_parts/tableau.vue'
+import trial from '../trial_parts/trial.vue'
+
 
 export default {
   name: 'instructionMod',
@@ -24,8 +34,8 @@ export default {
       default: ""
     },
     tableau: {
-      type: String,
-      default: ""
+      type: Object,
+      default: () => { return {} }
     }, // for displaying tableau panes
     completionCondition: Object,
     errorMessage: {
@@ -35,7 +45,8 @@ export default {
     currentlyPressedKeys: Array
   },
   components: {
-    tableau
+    tableau,
+    trial
   },
   data: () => {
     return {
@@ -68,7 +79,6 @@ export default {
   },
   watch: {
     currentlyPressedKeys(newValue, oldValue) {
-
         // simultaneous evaluation
         if (this.completionCondition.simultaneous === true) {
 

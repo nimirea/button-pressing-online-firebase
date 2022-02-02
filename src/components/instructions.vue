@@ -241,70 +241,79 @@ export default {
     return {
       current_module: 0, // initialize current module at 0
       modules: [ // list of modules to show
-        {
-          text: [
-            'Welcome! In this part of the session, we\'ll be setting up your equipment for the experiment.',
-            "Important: please DO <b>NOT</b> use the back button or refresh the study at any point during this experiment—you will lose your place!",
-            "At this time, please:<ul><li>make sure you are in a quiet place where you will not be disturbed for at least an hour, with a flat desk surface large enough for the provided external keyboard</li><li>connect your headphones</li><li>maximize your browser window</li></ul>"
-          ],
-          completionCondition: {
-            sequence: [],
-            simultaneous: null,
-            text: 'I am in a quiet place, my headphones are connected, and my browser window is maximized.'
-          }
-        },
-        {
-          text: [
-            'Great! Now it\'s time to connect the provided external keyboard to your computer\'s USB port.',
-            'Once connected, please turn the keyboard <b>upside-down</b>, so that the space bar is facing <i><b>away</b></i> from you, and put all your fingers except your pinkies on the stickered keys, as shown:'
-          ],
-          image: "keyboard-hands.jpeg",
-          completionCondition: {
-            sequence: ['left ring finger', 'left middle finger', 'left index finger', 'left thumb', 'right thumb', 'right index finger', 'right middle finger', 'right ring finger'],
-            simultaneous: false,
-            text: 'You\'ll be keeping your fingers in the same position for the duration of the experiment.</p><p>To continue, please press all 8 fingers on the stickered keys one by one, from left to right (starting with your left ring finger and ending with your right ring finger).'
-          }
-        },
-        {
-          text: [
-            'Awesome! Please keep your fingers in the current position for the duration of the experiment.',
-            'In this experiment we\'ll be asking you to key in sequences of nine buttons in a specific order. Each sequence will appear as a set of three panes, like this:'
-          ],
-          tableau: "iLtLiR mLtLiR rRtLmR",
-          completionCondition: {
-            sequence: ['left thumb', 'right thumb'],
-            simultaneous: true,
-            text: "Please press both thumbs to continue."
-          }
-        },
-        {
-          text: [
-            'Within each pane, we\'d like you to press the three colored buttons in a specific order:',
-            '<ol> \
-              <li><span class="red">red</span></li> \
-              <li><span class="blue">blue</span></li> \
-              <li><span class="gray">gray</span></li> \
-            </ol>',
-            'Let\'s zoom in on the first pane as an example.'
-          ],
-          tableau: "iLtLiR",
-          completionCondition: {
-            sequence: [],
-            simultaneous: false,
-            text: "Try it for yourself, by pressing the keys in order."
-          }
-        },
-        {
-          text: [
-            'Now try the whole sequence, from left to right. Remember: <span class="red">red</span> first, then <span class="blue">blue</span>, then <span class="gray">gray</span>.'
-          ],
-          tableau: "iLtLiR mLtLiR rRtLmR",
-          completionCondition: {
-            sequence: [],
-            simultaneous: false,
-            text: ""
-          }
-        },
+        // {
+        //   text: [
+        //     'Welcome! In this part of the session, we\'ll be setting up your equipment for the experiment.',
+        //     "Important: please DO <b>NOT</b> use the back button or refresh the study at any point during this experiment—you will lose your place!",
+        //     "At this time, please:<ul><li>make sure you are in a quiet place where you will not be disturbed for at least an hour, with a flat desk surface large enough for the provided external keyboard</li><li>connect your headphones</li><li>maximize your browser window</li></ul>"
+        //   ],
+        //   completionCondition: {
+        //     sequence: [],
+        //     simultaneous: null,
+        //     text: 'I am in a quiet place, my headphones are connected, and my browser window is maximized.'
+        //   }
+        // },
+        // {
+        //   text: [
+        //     'Great! Now it\'s time to connect the provided external keyboard to your computer\'s USB port.',
+        //     'Once connected, please turn the keyboard <b>upside-down</b>, so that the space bar is facing <i><b>away</b></i> from you, and put all your fingers except your pinkies on the stickered keys, as shown:'
+        //   ],
+        //   image: "keyboard-hands.jpeg",
+        //   completionCondition: {
+        //     sequence: ['left ring finger', 'left middle finger', 'left index finger', 'left thumb', 'right thumb', 'right index finger', 'right middle finger', 'right ring finger'],
+        //     simultaneous: false,
+        //     text: 'You\'ll be keeping your fingers in the same position for the duration of the experiment.</p><p>To continue, please press all 8 fingers on the stickered keys one by one, from left to right (starting with your left ring finger and ending with your right ring finger).'
+        //   }
+        // },
+        // {
+        //   text: [
+        //     'Awesome! Please keep your fingers in the current position for the duration of the experiment.',
+        //     'In this experiment we\'ll be asking you to key in sequences of nine buttons in a specific order. Each sequence will appear as a set of three panes, like this:'
+        //   ],
+        //   tableau: {
+        //     stimRef: "iLtLiR mLtLiR rRtLmR",
+        //     playable: false
+        //   },
+        //   completionCondition: {
+        //     sequence: ['left thumb', 'right thumb'],
+        //     simultaneous: true,
+        //     text: "Please press both thumbs to continue."
+        //   }
+        // },
+        // {
+        //   text: [
+        //     'Within each pane, we\'d like you to press the three colored buttons in a specific order:',
+        //     '<ol> \
+        //       <li><span class="red">red</span></li> \
+        //       <li><span class="blue">blue</span></li> \
+        //       <li><span class="gray">gray</span></li> \
+        //     </ol>',
+        //     'Let\'s zoom in on the first pane as an example.'
+        //   ],
+        //   tableau: {
+        //     stimRef: "iLtLiR",
+        //     playable: false
+        //   },
+        //   completionCondition: {
+        //     sequence: [],
+        //     simultaneous: false,
+        //     text: "Try it for yourself, by pressing the keys in order."
+        //   }
+        // },
+        // {
+        //   text: [
+        //     'Now try the whole sequence, from left to right. Remember: <span class="red">red</span> first, then <span class="blue">blue</span>, then <span class="gray">gray</span>.'
+        //   ],
+        //   tableau: {
+        //     stimRef: "iLtLiR mLtLiR rRtLmR",
+        //     playable: false
+        //   },
+        //   completionCondition: {
+        //     sequence: [],
+        //     simultaneous: false,
+        //     text: ""
+        //   }
+        // },
         {
           text: [
             "Excellent! This is how sequences will be displayed in the experiment.",
@@ -319,6 +328,30 @@ export default {
             sequence: ['left thumb', 'right thumb'],
             simultaneous: true,
             text: "Please press both thumbs to see and hear an example of this."
+          }
+        },
+        {
+          text: ["The instructions outside the box will NOT appear in the actual experiment."],
+          tableau: {
+            stimRef: "iLtLiR mLtLiR rRtLmR",
+            playable: true
+          },
+          completionCondition: {
+            sequence: ['left thumb', 'right thumb'],
+            simultaneous: true,
+            text: "When you're ready to continue and try another sample trial for yourself with the metronome, press both thumbs. The trial will start automatically."
+          }
+        },
+        {
+          text: ["This time, try on your own"],
+          tableau: {
+            stimRef: "mRtRrL rRtRiL mLtRiR",
+            playable: true
+          },
+          completionCondition: {
+            sequence: ['left thumb', 'right thumb'],
+            simultaneous: false,
+            text: "Looks like you've got the hang of it! Next, press both thumbs to continue to the experiment."
           }
         }
       ],
@@ -361,7 +394,7 @@ export default {
             // map stimuli notation to keys
             if (this.modules[m].tableau != undefined) {
 
-              let panes = this.modules[m].tableau.split(" ")
+              let panes = this.modules[m].tableau.stimRef.split(" ")
               panes.map((pane) => {
                 for (let index = 0; index < pane.length; index += 2) {
                   cc[m].sequence.push(pane.slice(index, index + 2))

@@ -3,7 +3,7 @@
     <pane
       v-for="(pane, p) in panes"
       :image="pane"
-      :focused="focused_pane === p"
+      :focused="focusedPane === p"
       :key="p"
     ></pane>
   </div>
@@ -15,15 +15,14 @@ import pane from './pane.vue'
 export default {
   name: 'tableau',
   props: {
-    stimRef: String
+    stimRef: String, // which stimulus to display, in abbreviated notation
+    focusedPane: { // watched property
+      type: Number,
+      default: null
+    }
   },
   components: {
     pane
-  },
-  data: () => {
-    return {
-      focused_pane: null
-    }
   },
   computed: {
     panes() {
