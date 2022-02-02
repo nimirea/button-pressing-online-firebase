@@ -11,13 +11,13 @@
     :focused-pane="focused_pane"
   ></tableau>
 </div>
-<div class="tableau" v-if="example && playing">
+<div class="tableau" v-if="showInstructions">
   <p v-for="(n, p) in n_panes" :key="p" class="current-instructions">
     <span v-if="focused_pane === p" :class="[current_instructions]">{{current_instructions}}</span>
   </p>
 </div>
-<p class="current-instructions" v-if="example && focused_pane === null">get ready...</p>
-<p class="current-instructions" v-else-if="example && focused_pane === -1 && playing">pause</p>
+<p class="current-instructions" v-if="showInstructions && focused_pane === null">get ready...</p>
+<p class="current-instructions" v-else-if="showInstructions && focused_pane === -1 && playing">pause</p>
 <!-- <p v-if="example" v-html="current_instructions"></p> -->
 </div>
 </template>
@@ -36,9 +36,21 @@ export default {
       type: Boolean,
       default: false
     },
+    currentlyPressedKeys: {
+      type: Array,
+      default: () => { return []; }
+    },
     metronome_sound_path: {
       type: String,
       default: '/static/metronome.mp3'
+    },
+    showInstructions: {
+      type: Boolean,
+      default: false
+    },
+    needsResponse: {
+      type: Boolean,
+      default: false
     },
     // timing parameters (sound should match these):
     ms_isi: { // number of ms to wait after metronome start to display stimulus
@@ -81,7 +93,8 @@ export default {
       metronome: null,
       isi: 1000, // interstimulus interval, in ms
       n_panes: 0,
-      current_instructions: ""
+      current_instructions: "",
+      keys_pressed_during_trial: []
     }
   },
   methods: {
@@ -130,6 +143,12 @@ export default {
         this.display_tableau = false
         this.playing = false;
 
+        // check for no response
+        if (this.keys_pressed_during_trial.length === 0 && this.needsResponse === true) {
+          this.$emit('no-keys-pressed')
+          console.log("emitted no keys pressed")
+        }
+
         // emit done event
         this.$emit('done')
 
@@ -163,12 +182,10 @@ export default {
 
       let shift_focus = function() {
         counter++;
-        console.log(counter)
 
         if (counter < maximum_panes * (vm.keys_in_pane.length + 1) - 1) {
           if (counter % (vm.keys_in_pane.length + 1) !== vm.keys_in_pane.length) {
               vm.current_instructions = vm.keys_in_pane[counter % (vm.keys_in_pane.length + 1)]
-              console.log(vm.current_instructions + " " + counter);
               vm.focused_pane = Math.floor(counter / (vm.keys_in_pane.length + 1)) % vm.n_panes;
           } else {
             vm.focused_pane = -1;
@@ -187,14 +204,46 @@ export default {
         shift_focus,
         frequency
       )
+    },
+    log_key: function(key) {
+      let current_time = new Date()
+      this.keys_pressed_during_trial.push({
+        'key': key,
+        'time': current_time
+      })
     }
   },
   created: function() {
     // initialize number of panes in stimulus
     this.n_panes = this.stimRef.split(" ").length
+    this.load_metronome();
   },
-  mounted: function() {
-    this.metronome = this.load_metronome();
+  watch: {
+    currentlyPressedKeys(newValue, oldValue) {
+
+      // only log keys while trial is playing
+      if (this.playing === true) {
+
+        let difference = function(arrayA, arrayB) {
+            let setA = new Set(arrayA)
+            let setB = new Set(arrayB)
+
+            const diff = new Set(setA);
+
+            for (const elem of setB) {
+                diff.delete(elem);
+            }
+
+            return diff;
+        }
+
+        let new_keys = difference(newValue, oldValue)
+        if (new_keys.size > 0) {
+          new_keys.forEach(this.log_key)
+        }
+
+      }
+    }
   }
 }
 

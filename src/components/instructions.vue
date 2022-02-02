@@ -10,14 +10,18 @@
         :completion-condition = "completionConds[m]"
       ></instruction-mod>
     </div> -->
-    <instruction-mod
-      :paragraphs = "modules[current_module].text"
-      :completion-condition = "completionConds[current_module]"
-      :image = "modules[current_module].image"
-      :tableau = "modules[current_module].tableau"
-      :currently-pressed-keys = "currentlyPressedKeys"
-      @advance="nextModule()"
-    ></instruction-mod>
+    <div v-for="(module, m) in modules" :key="m">
+      <instruction-mod
+        v-if="current_module === m"
+        :paragraphs = "module.text"
+        :completion-condition = "completionConds[m]"
+        :image = "module.image"
+        :tableau = "module.tableau"
+        :currently-pressed-keys = "currentlyPressedKeys"
+        :error-message = "module.errorMessage"
+        @advance="nextModule()"
+      ></instruction-mod>
+    </div>
 
   <!-- keyboard check
   <div v-if="!expOver & taskList[currentTask].name == 'equipment_setup'">
@@ -327,32 +331,35 @@ export default {
           completionCondition: {
             sequence: ['left thumb', 'right thumb'],
             simultaneous: true,
-            text: "Press both thumbs to see and hear an example of this. <b>Text below the example is just for illustration, and will not appear in the experiment.</b>"
+            text: "Press both thumbs to see and hear an example of this. <b>The text you'll see below the example is just for illustration, and will not appear in the experiment.</b>"
           }
         },
         {
           text: [""],
           tableau: {
             stimRef: "iLtLiR mLtLiR rRtLmR",
-            playable: true
+            playable: true,
+            pane_by_pane_instructions: true
           },
           completionCondition: {
             sequence: ['left thumb', 'right thumb'],
             simultaneous: true,
-            text: "When you're ready to continue and try a different sample trial for yourself with the metronome, press both thumbs. The trial will start automatically."
+            text: "When you're ready to continue and try a different sample trial with the metronome, press both thumbs. The trial will start automatically, and the text you saw below the box won't appear on this next trial."
           }
         },
         {
-          text: ["This time, try on your own"],
+          text: ["Try this one on your own:"],
           tableau: {
             stimRef: "mRtRrL rRtRiL mLtRiR",
-            playable: true
+            playable: true,
+            needs_response: true
           },
           completionCondition: {
             sequence: ['left thumb', 'right thumb'],
-            simultaneous: false,
-            text: "Looks like you've got the hang of it! Next, press both thumbs to continue to the experiment."
-          }
+            simultaneous: true,
+            text: "Looks like you've got the hang of it! Press both thumbs to continue to the experiment."
+          },
+          errorMessage: "We didn't get any keypresses from you."
         }
       ],
       keyAbbrevs: {
