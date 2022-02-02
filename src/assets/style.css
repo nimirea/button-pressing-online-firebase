@@ -105,6 +105,10 @@ button {
 .on-beat {
   box-shadow: 0 0 1rem 0.75rem yellow;
 }
+.current-instructions {
+  width: 100%;
+  text-align: center;
+}
 
 .rec-symbols {
   font-size: 2rem;

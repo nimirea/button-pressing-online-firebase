@@ -327,7 +327,7 @@ export default {
           completionCondition: {
             sequence: ['left thumb', 'right thumb'],
             simultaneous: true,
-            text: "Please press both thumbs to see and hear an example of this."
+            text: "Press both thumbs to see and hear an example of this. <b>Text below the example is just for illustration, and will not appear in the experiment.</b>"
           }
         },
         {

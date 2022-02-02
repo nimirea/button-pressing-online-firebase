@@ -11,7 +11,14 @@
     :focused-pane="focused_pane"
   ></tableau>
 </div>
-<p v-if="example" v-html="current_instructions"></p>
+<div class="tableau" v-if="example && playing">
+  <p v-for="(n, p) in n_panes" :key="p" class="current-instructions">
+    <span v-if="focused_pane === p" :class="[current_instructions]">{{current_instructions}}</span>
+  </p>
+</div>
+<p class="current-instructions" v-if="example && focused_pane === null">get ready...</p>
+<p class="current-instructions" v-else-if="example && focused_pane === -1 && playing">pause</p>
+<!-- <p v-if="example" v-html="current_instructions"></p> -->
 </div>
 </template>
 <script>
@@ -121,6 +128,7 @@ export default {
       setTimeout(() => {
         // show fixation cross again
         this.display_tableau = false
+        this.playing = false;
 
         // emit done event
         this.$emit('done')
