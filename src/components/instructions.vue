@@ -1,7 +1,6 @@
 <template>
 
 <div class="instructions">
-  <h1>Equipment Setup and Instructions</h1>
   <div v-for="(module, m) in modules" :key="m">
     <instruction-mod
       v-if="current_module === m"
@@ -185,6 +184,7 @@ export default {
         this.current_module++;
       } else {
         console.log("END OF INSTRUCTIONS")
+        this.$emit('advance');
       }
     }
   },
