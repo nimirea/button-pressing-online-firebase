@@ -341,7 +341,7 @@ export default {
           'day': this.day
         }).then((res) => {
 
-          if (this.test_mode === true && res.data === null) {
+          if (this.test_mode === true) {
             this.prevDayIncomplete = false;
             this.alreadyDone = false;
           } else {
