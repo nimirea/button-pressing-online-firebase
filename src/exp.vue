@@ -218,6 +218,39 @@ export default {
     },
     uploadData: fb_functions.httpsCallable('uploadData'),
 
+    // calculate time remaining (update timeRemainingString and minsRemaining)
+    // d = previous day
+    // usually, you will want to do something with timeRemainingString / minsRemaining afterwards, so we have a callback
+    updateTimeRemaining: function(d, _callback = () => { return null }) {
+
+      var gct = fb_functions.httpsCallable('getStartTime');
+      gct({
+        participant_id: this.participant_id,
+        day: d
+      })
+      .then((res) => {
+
+        var lastTimestamp = res.data;
+
+        if (lastTimestamp === null) {
+          this.minsRemaining = 0
+        } else {
+          this.minsRemaining = 1440 - Math.floor((new Date().getTime() - lastTimestamp)/(1000*60));
+        }
+
+        var roundedHours = Math.floor(this.minsRemaining / 60)
+
+        this.timeRemainingString = roundedHours + " hours";
+
+        if (roundedHours * 60 < this.minsRemaining) {
+          this.timeRemainingString = this.timeRemainingString + " and " + (this.minsRemaining - roundedHours * 60) + " minutes";
+        }
+
+      }).then(() => {
+        _callback();
+      });
+    },
+
     updateFormErrors: function(namedErrors) {
       // store data
       this.errorCounts[namedErrors['element_name']] = namedErrors['num_errors']
