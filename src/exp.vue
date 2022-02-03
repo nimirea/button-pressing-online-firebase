@@ -67,7 +67,7 @@
     </div>
   </div>
 <div v-if="unfocused" class="overlay">
-  <p>Please click here and put your hands on the provided keyboard to continue.</p>
+  <p>Please click here and put your hands on the provided keyboard to continue the experiment.</p>
 </div>
 </div>
 </template>
