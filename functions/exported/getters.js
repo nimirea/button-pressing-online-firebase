@@ -295,16 +295,24 @@ let calcCompletionStatus = function(data) {
   return DB.ref('ppt/' + data.participant_id + '/completionTime').once('value')
     .then((snapshot_ldc) => {
       // day 1 is excluded from this calculation
-      if (snapshot_ldc.val() !== null) {
+      if (data.day > 1) {
 
-        let timestamps = snapshot_ldc.val().filter((item) => {
-          return !(item.isEmpty)
-        })
-
-        if (timestamps.length >= data.day) {
-          result_value.alreadyDone = true;
-        } else if (timestamps.length !== data.day - 1) {
+        // if there is no data, the previous day MUST be incomplete
+        if (snapshot_ldc.val() === null) {
           result_value.prevDayIncomplete = true;
+        } else {
+
+          // calculate completion based on timestamps found in database
+          let timestamps = snapshot_ldc.val().filter((item) => {
+            return !(item.isEmpty)
+          })
+
+          if (timestamps.length >= data.day) {
+            result_value.alreadyDone = true;
+          } else if (timestamps.length !== data.day - 1) {
+            result_value.prevDayIncomplete = true;
+          }
+
         }
 
       }
