@@ -6,6 +6,7 @@
 
   <tableau
     v-if="Object.keys(tableau).length !== 0 && tableau.playable === false"
+    :focused-pane = "tableau.highlighted_pane"
     :stim-ref="tableau.stimRef"
   ></tableau>
   <trial
