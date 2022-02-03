@@ -1,5 +1,5 @@
 <template>
-  <div id="app" v-cloak>
+<div id="app" v-cloak>
 
     <!-- check for outdated browser -->
     <div v-if="browserOutdated">
@@ -46,19 +46,9 @@
       @advance="currentTask++"
     ></instructions>
 
-    <!-- actual trials -->
-      <div v-if="isStarted" class="stim">
-        <div v-if="!trialEnded && stimVisible" class="tableau">
-          <img v-for="(pane_img, pane_idx) in breakIntoPanes(stimList[currentStim]['twister'])"
-            :key="pane_img"
-            :src="pane_img" class="pane" :class="{ 'on-beat': pane_idx == keypress_stimlist[currentStim].focused_pane }"/>
-        </div>
-        <div v-else>
-          <img src="./assets/fixcross.png" alt="Fixation cross" class="fixcross"/>
-        </div>
-        <p v-if="trialEnded">press both thumbs for {{ thumbPressSecs }} seconds to continue</p>
-      </div>
-    </div>
+    <!-- TODO: actual trials -->
+
+
 
     <!--post-task survey-->
     <div v-if="taskList[currentTask].name == 'survey' && expOver === false">
@@ -76,6 +66,10 @@
       <p v-else>Thank you for your participation in this experiment! We look forward to seeing you at your equipment drop-off appointment.</p>
     </div>
   </div>
+<div v-if="unfocused" class="overlay">
+  <p>Please click here and put your hands on the provided keyboard to continue.</p>
+</div>
+</div>
 </template>
 
 <script>
@@ -158,9 +152,8 @@ export default {
         timestamp: null,
         key: null
       },
-      currentKeyTrial: null,
+      unfocused: false,
       currentlyPressedKeys: [],
-      thumbPressSecs: 2,
       waitText: "",
       thumbWaitInterval: null,
       keyAbbrevs: {
@@ -220,11 +213,6 @@ export default {
       Object.assign(lk, this.lastKeypress)
       this.currentlyPressedKeys.push(lk);
 
-      // if a keyTrial is happening:
-      if (this.currentKeyTrial != null) {
-        this.checkCurrentKeyTrial();
-      }
-
       return;
 
     },
@@ -278,6 +266,8 @@ export default {
 
       // add event listeners
       let v = this;
+
+      // keys:
       window.addEventListener('keydown', (e) => {
         if (v.currentlyPressedKeys.map((k) => { return k.key }).includes(e.key) !== true) {
           v.keyFunction(e);
@@ -290,6 +280,14 @@ export default {
           v.waitText = "";
         }
       });
+
+      // window blur
+      window.addEventListener('blur', () => {
+        v.unfocused = true;
+      })
+      window.addEventListener('focus', () => {
+        v.unfocused = false;
+      })
 
       // getting participant ID from URL
       var urlParams = new URLSearchParams(window.location.search);
