@@ -21,7 +21,13 @@
     ref="currentTrial"
   ></trial>
 
-  <p v-if="completionCondition.sequence.length > 0 && (tableau.playable !== true || (trial_played === true && error_made === false))" v-html="completionCondition.text"></p>
+  <div v-if="completionCondition.sequence.length > 0
+      && (tableau.playable !== true
+            || (trial_played === true && error_made === false)
+          )">
+      <p v-html="completionCondition.text"></p>
+      <p v-if="expLenMins > 0">The session will last approximately {{expLenMins}} minutes.</p>
+  </div>
   <button v-if="completionCondition.sequence.length == 0" v-html="completionCondition.text" @click="complete"></button>
 
   <p v-if="error_made" v-html="'<b>' + error_message + '</b>'"></p>
@@ -49,7 +55,11 @@ export default {
       type: String,
       default: "That's not quite right! Go ahead and try again, starting from the beginning."
     },
-    currentlyPressedKeys: Array
+    currentlyPressedKeys: Array,
+    expLenMins: {
+      type: Number,
+      default: -1
+    }
   },
   components: {
     tableau,

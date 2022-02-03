@@ -38,7 +38,7 @@
     <!-- instructions -->
     <instructions
       v-if="taskList[currentTask].name === 'equipment-setup'"
-      :exp-len="48"
+      :n-stim="stimList.length"
       :day="day"
       :fingers-to-keys="fingersToKeys"
       :key-pressed="lastKeypress.key"
