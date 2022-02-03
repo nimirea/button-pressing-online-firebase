@@ -1,9 +1,9 @@
 <template>
 
 <div class="instructions">
-  <div v-for="(module, m) in modules" :key="m">
+  <div v-for="(module, m) in modulesShownToday" :key="m">
     <instruction-mod
-      v-if="current_module === m"
+      v-if="current_module === m && module.days_shown.indexOf(day) !== -1"
       :paragraphs = "module.text"
       :completion-condition = "completionConds[m]"
       :image = "module.image"
@@ -45,7 +45,8 @@ export default {
             sequence: [],
             simultaneous: null,
             text: 'I am in a quiet place, my headphones are connected, and my browser window is maximized.'
-          }
+          },
+          days_shown: [1, 2, 3, 4]
         },
         {
           text: [
@@ -57,7 +58,8 @@ export default {
             sequence: ['left ring finger', 'left middle finger', 'left index finger', 'left thumb', 'right thumb', 'right index finger', 'right middle finger', 'right ring finger'],
             simultaneous: false,
             text: 'You\'ll be keeping your fingers in the same position for the duration of the experiment.</p><p>To continue, please press all 8 stickered keys one by one, from left to right (starting with your left ring finger and ending with your right ring finger).'
-          }
+          },
+          days_shown: [1, 2, 3, 4]
         },
         {
           text: [
@@ -72,7 +74,8 @@ export default {
             sequence: ['left thumb', 'right thumb'],
             simultaneous: true,
             text: "Please press both thumbs to continue."
-          }
+          },
+          days_shown: [1]
         },
         {
           text: [
@@ -92,7 +95,8 @@ export default {
             sequence: [],
             simultaneous: false,
             text: "Try it for yourself, by pressing the keys in order."
-          }
+          },
+          days_shown: [1]
         },
         {
           text: [
@@ -106,7 +110,8 @@ export default {
             sequence: [],
             simultaneous: false,
             text: "From time to time during the experiment, we'll remind you of this order."
-          }
+          },
+          days_shown: [1]
         },
         {
           text: [
@@ -133,7 +138,8 @@ export default {
              adjust your volume to make sure you can comfortably hear the metronome.\
              <b>Note: the text you'll see under the example is just for illustration,\
              and will not appear in the experiment.</b>"
-          }
+          },
+          days_shown: [1]
         },
         {
           text: [""],
@@ -147,7 +153,8 @@ export default {
             simultaneous: true,
             text: "Next, let's try a different sample trial with the metronome. Remember, do your best to keep up with the metronome, and <b>do NOT</b> go back to correct yourself if you make a mistake.</p>\
             <p>When you're ready to continue, press both thumbs. The trial will start automatically, and the text you saw below the box won't appear on this next trial."
-          }
+          },
+          days_shown: [1]
         },
         {
           text: ["Try this one on your own:"],
@@ -161,7 +168,24 @@ export default {
             simultaneous: true,
             text: "Looks like you've got the hang of it!</p><p>Press both thumbs to continue to the experiment. The first trial will start automatically."
           },
-          errorMessage: "We didn't get any keypresses from you."
+          errorMessage: "We didn't get any keypresses from you.",
+          days_shown: [1]
+        },
+        {
+          text: [
+            'Just like before, press the keys within each pane in the same color order: <span class="red">red</span> first, then <span class="blue">blue</span>, then <span class="gray">gray</span>.',
+            'Try the sequence once, as practice. Remember to do each pane left to right:'
+          ],
+          tableau: {
+            stimRef: "iRtLiL mLtLiR rRtLmR",
+            playable: false
+          },
+          completionCondition: {
+            sequence: [],
+            simultaneous: false,
+            text: "As before, we'll remind you of this order from time to time during the experiment."
+          },
+          days_shown: [2, 3, 4]
         }
       ],
       keyAbbrevs: {
@@ -180,7 +204,7 @@ export default {
     },
     nextModule() {
       //advance view to next module
-      if (this.current_module < this.modules.length - 1) {
+      if (this.current_module < this.modulesShownToday.length - 1) {
         this.current_module++;
       } else {
         console.log("END OF INSTRUCTIONS")
@@ -189,20 +213,27 @@ export default {
     }
   },
   computed: {
+    modulesShownToday() {
+      let vm = this;
+
+      return this.modules.filter((element) => {
+        return (element.days_shown.indexOf(vm.day) !== -1)
+      })
+    },
     completionConds() {
         let cc = []
 
-        for (let m = 0, len = this.modules.length; m < len; m++) {
+        for (let m = 0, len = this.modulesShownToday.length; m < len; m++) {
           cc[m] = {
             sequence: [],
-            simultaneous: this.modules[m].completionCondition.simultaneous,
-            text: this.modules[m].completionCondition.text
+            simultaneous: this.modulesShownToday[m].completionCondition.simultaneous,
+            text: this.modulesShownToday[m].completionCondition.text
           }
 
-          if (this.modules[m].completionCondition.sequence.length === 0) {
+          if (this.modulesShownToday[m].completionCondition.sequence.length === 0) {
 
             // map stimuli notation to keys
-            if (this.modules[m].tableau != undefined) {
+            if (this.modulesShownToday[m].tableau != undefined) {
 
               let panes = this.modules[m].tableau.stimRef.split(" ")
               panes.map((pane) => {
@@ -225,8 +256,8 @@ export default {
 
           } else {
 
-            for (let k = 0, seq_len = this.modules[m].completionCondition.sequence.length; k < seq_len; k++) {
-              cc[m].sequence.push(this.mapToKey(this.modules[m].completionCondition.sequence[k]))
+            for (let k = 0, seq_len = this.modulesShownToday[m].completionCondition.sequence.length; k < seq_len; k++) {
+              cc[m].sequence.push(this.mapToKey(this.modulesShownToday[m].completionCondition.sequence[k]))
             }
 
           }
