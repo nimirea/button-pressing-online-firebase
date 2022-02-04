@@ -47,7 +47,14 @@
     ></instructions>
 
     <!-- TODO: actual trials -->
-
+    <trial-loop
+      v-if="taskList[currentTask].name === 'button-pressing'"
+      :stim-list="stimList"
+      :currently-pressed-keys = "currentlyPressedKeys.map((item) => {return item.key })"
+      :advance-keys="[fingersToKeys['left thumb'], fingersToKeys['right thumb']]"
+      :advance-key-text="'both thumbs'"
+      @advance="currentTask++"
+    ></trial-loop>
 
 
     <!--post-task survey-->
@@ -79,6 +86,7 @@
 // import textboxQuestion from './components/form_parts/textbox-question.vue'
 import postTaskSurvey from './components/posttask-survey.vue'
 import instructions from './components/instructions.vue'
+import trialLoop from './components/trial_parts/trial-loop.vue'
 
 // Initialize Cloud Functions through Firebase
 import { fb_functions } from "./fb_init.js"
@@ -90,7 +98,8 @@ export default {
   name: 'ExperimentSession',
   components: {
     instructions,
-    postTaskSurvey
+    postTaskSurvey,
+    trialLoop
   },
   data: function() {
     return {
