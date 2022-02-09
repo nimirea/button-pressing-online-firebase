@@ -1,21 +1,20 @@
 <template>
 <div>
-<div :class="{ 'example-trial': example }">
-  <!-- fixation cross -->
-  <div v-if="display_tableau === false" class="stim">
-    <img :src="require('@/assets/fixcross.png')" alt="Fixation cross" class="fixcross"/>
+  <div :class="{ 'example-trial': example }">
+    <!-- fixation cross -->
+    <img v-if="display_tableau === false" :src="require('@/assets/fixcross.png')" alt="Fixation cross" class="fixcross"/>
+    <!-- show tableau otherwise -->
+    <tableau v-else
+      :stim-ref="stimRef"
+      :focused-pane="focused_pane"
+    ></tableau>
   </div>
-  <!-- show tableau otherwise -->
-  <tableau v-else
-    :stim-ref="stimRef"
-    :focused-pane="focused_pane"
-  ></tableau>
-</div>
-<div class="tableau" v-if="showInstructions">
-  <p v-for="(n, p) in n_panes" :key="p" class="current-instructions">
-    <span v-if="focused_pane === p" :class="[current_instructions]">{{current_instructions}}</span>
-  </p>
-</div>
+  <!-- instructions: -->
+  <div class="tableau" v-if="showInstructions">
+    <p v-for="(n, p) in n_panes" :key="p" class="current-instructions">
+      <span v-if="focused_pane === p" :class="[current_instructions]">{{current_instructions}}</span>
+    </p>
+  </div>
 <p class="current-instructions" v-if="showInstructions && focused_pane === null">get ready...</p>
 <p class="current-instructions" v-else-if="showInstructions && focused_pane === -1 && playing">pause</p>
 <!-- <p v-if="example" v-html="current_instructions"></p> -->

@@ -1,7 +1,7 @@
 <template>
 <div>
   <div v-for="(stim, s) in stimList"
-    :key="s">
+    :key="s" class="stim">
     <trial
       v-if="currentStim === s"
       :key="s"
@@ -11,9 +11,9 @@
       @done="between_trials = true"
       @no-keys-pressed="nkp_error = true"
     ></trial>
+    <p v-if="between_trials && currentStim === s">Press {{advanceKeyText}} to continue.</p>
+    <p v-if="nkp_error && currentStim === s"><b>We did not record any keypresses from you on the last trial.</b> Participation is required in order to receive full credit for this session.</p>
   </div>
-  <p v-if="nkp_error"><b>We did not record any keypresses from you on the last trial.</b> Participation is required in order to receive full credit for this session.</p>
-  <p v-if="between_trials">Press {{advanceKeyText}} to continue.</p>
 </div>
 </template>
 <script>
