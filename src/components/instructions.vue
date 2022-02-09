@@ -31,7 +31,8 @@ export default {
     fingersToKeys: Object,
     keyPressed: String,
     currentlyPressedKeys: Array,
-    nStim: Number
+    nStim: Number,
+    testMode: Boolean
   },
   data: () => {
     return {
@@ -223,6 +224,11 @@ export default {
         console.log("END OF INSTRUCTIONS")
         this.$emit('advance');
       }
+    }
+  },
+  mounted: function() {
+    if (this.testMode === true) {
+      this.current_module = this.modulesShownToday.length - 1
     }
   },
   computed: {

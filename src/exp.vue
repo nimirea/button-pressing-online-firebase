@@ -40,6 +40,7 @@
       v-if="taskList[currentTask].name === 'equipment-setup'"
       :n-stim="stimList.length"
       :day="day"
+      :test-mode="test_mode"
       :fingers-to-keys="fingersToKeys"
       :key-pressed="lastKeypress.key"
       :currently-pressed-keys="currentlyPressedKeys.map((item) => {return item.key })"
