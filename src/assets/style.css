@@ -98,6 +98,13 @@ button {
   height: 2rem;
 }
 
+.refresher img.pane {
+  max-width: 33%;
+}
+.refresher p {
+  font-size: 1.5rem;
+}
+
 /* button-pressing stimuli */
 .tableau {
   display: flex;

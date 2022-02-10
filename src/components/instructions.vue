@@ -32,7 +32,8 @@ export default {
     keyPressed: String,
     currentlyPressedKeys: Array,
     nStim: Number,
-    testMode: Boolean
+    testMode: Boolean,
+    keyAbbrevs: Object
   },
   data: () => {
     return {
@@ -163,7 +164,7 @@ export default {
           text: ["Try this one on your own:"],
           tableau: {
             stimRef: "mRtRrL rRtRiL mLtRiR",
-            playable: true,
+            playable: false,
             needs_response: true
           },
           completionCondition: {
@@ -201,15 +202,7 @@ export default {
           },
           days_shown: [2, 3, 4]
         }
-      ],
-      keyAbbrevs: {
-        'R': 'right',
-        'L': 'left',
-        't': 'thumb',
-        'i': 'index finger',
-        'r': 'ring finger',
-        'm': 'middle finger'
-      }
+      ]
     }
   },
   methods: {

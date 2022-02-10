@@ -45,6 +45,7 @@
       :key-pressed="lastKeypress.key"
       :currently-pressed-keys="currentlyPressedKeys.map((item) => {return item.key })"
       @advance="currentTask++"
+      :key-abbrevs="keyAbbrevs"
     ></instructions>
 
     <!-- TODO: actual trials -->
@@ -54,7 +55,10 @@
       :currently-pressed-keys = "currentlyPressedKeys.map((item) => {return item.key })"
       :advance-keys="[fingersToKeys['left thumb'], fingersToKeys['right thumb']]"
       :advance-key-text="'both thumbs'"
+      :fingers-to-keys="fingersToKeys"
+      :refresher-freq="2"
       @advance="currentTask++"
+      :key-abbrevs="keyAbbrevs"
     ></trial-loop>
 
 
@@ -166,7 +170,7 @@ export default {
       currentlyPressedKeys: [],
       waitText: "",
       thumbWaitInterval: null,
-      keyAbbrevs: {
+      keyAbbrevs: { // key abbreviations within stimuli
         'R': 'right',
         'L': 'left',
         't': 'thumb',
