@@ -73,8 +73,15 @@ button {
   left: 50%;
   transform: translate(-50%, -50%);
 }
-.stim p, .stim button {
+.after-stim p, .after-stim button {
   font-size:2rem;
+  text-align: center;
+}
+.after-stim {
+  position: absolute;
+  top: 55%;
+  left: 50%;
+  transform: translate(-50%, 0);
 }
 
 .example-trial > .stim {
@@ -85,6 +92,9 @@ button {
 }
 .fixcross {
   vertical-align: middle;
+  height: 3rem;
+}
+.example-trial .fixcross {
   height: 2rem;
 }
 

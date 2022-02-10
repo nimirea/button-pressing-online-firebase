@@ -12,8 +12,10 @@
       @done="between_trials = true"
       @no-keys-pressed="nkp_error = true"
     ></trial>
-    <p v-if="nkp_error && currentStim === s"><b>We did not record any keypresses from you on the last trial.</b> Please check that the provided keyboard is still plugged in, and click here before placing your fingers back on the keys.</p>
-    <p v-if="between_trials && currentStim === s">Press {{advanceKeyText}} to continue.</p>
+  </div>
+  <div class="after-stim">
+    <p v-if="nkp_error"><b>We did not record any keypresses from you on the last trial.</b> Please check that the provided keyboard is still plugged in, and click here before placing your fingers back on the keys.</p>
+    <p v-if="between_trials">Press {{advanceKeyText}} to continue.</p>
   </div>
 </div>
 </template>
