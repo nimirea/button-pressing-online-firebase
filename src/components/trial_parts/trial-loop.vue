@@ -8,11 +8,12 @@
       :example="false"
       :stim-ref="stim.twister"
       :currently-pressed-keys = "currentlyPressedKeys"
+      :needs-response = "true"
       @done="between_trials = true"
       @no-keys-pressed="nkp_error = true"
     ></trial>
+    <p v-if="nkp_error && currentStim === s"><b>We did not record any keypresses from you on the last trial.</b> Please check that the provided keyboard is still plugged in, and click here before placing your fingers back on the keys.</p>
     <p v-if="between_trials && currentStim === s">Press {{advanceKeyText}} to continue.</p>
-    <p v-if="nkp_error && currentStim === s"><b>We did not record any keypresses from you on the last trial.</b> Participation is required in order to receive full credit for this session.</p>
   </div>
 </div>
 </template>
