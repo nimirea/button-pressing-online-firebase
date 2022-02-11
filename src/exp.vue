@@ -56,8 +56,9 @@
       :advance-keys="[fingersToKeys['left thumb'], fingersToKeys['right thumb']]"
       :advance-key-text="'both thumbs'"
       :fingers-to-keys="fingersToKeys"
-      :refresher-freq="2"
+      :refresher-freq="20"
       @advance="currentTask++"
+      @upload="uploadTrial"
       :key-abbrevs="keyAbbrevs"
     ></trial-loop>
 
@@ -231,6 +232,20 @@ export default {
 
     },
     uploadData: fb_functions.httpsCallable('uploadData'),
+    uploadTrial: function(payload) {
+      // augment payload with context
+      payload.participant_id = this.participant_id
+      payload.day = this.day
+
+
+      // upload trial data to server
+      var ut = fb_functions.httpsCallable('uploadTrial');
+      ut(payload).then((res) => {
+        console.log(res.data);
+      })
+
+
+    },
 
     // calculate time remaining (update timeRemainingString and minsRemaining)
     // d = previous day

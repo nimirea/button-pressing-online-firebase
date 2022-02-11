@@ -93,7 +93,8 @@ export default {
       isi: 1000, // interstimulus interval, in ms
       n_panes: 0,
       current_instructions: "",
-      keys_pressed_during_trial: []
+      keys_pressed_during_trial: [],
+      start_time: null
     }
   },
   methods: {
@@ -128,7 +129,8 @@ export default {
     },
     run_trial: function() {
       this.playing = true
-      console.log("trial started")
+      this.start_time = new Date(); // log start time
+      console.log("trial started at " + this.start_time)
 
       // display tableau
       this.display_tableau = true;
@@ -149,7 +151,10 @@ export default {
         }
 
         // emit done event
-        this.$emit('done')
+        this.$emit('done', {
+          start_time: this.start_time,
+          keypresses: this.keys_pressed_during_trial
+        })
 
       }, this.n_panes * (
           this.ms_per_slow_pane * this.n_slow_reps

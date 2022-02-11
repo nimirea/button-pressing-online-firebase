@@ -162,6 +162,37 @@ let bookAppts = function(data) {
 }
 
 /**
+Upload a single trial to the realtime database.
+@param {Object} data with information to be uploaded. Must contain:
+  - participant_id
+  - day
+  - trial_number
+  - trial_data
+@return {Number} result code (1 = fail, 0 = success)
+*/
+let uploadTrial = function(data) {
+  let must_list = ['participant_id', 'day', 'trial_number', 'trial_data']
+
+  if (must_list.every(i => Object.keys(data).includes(i))) {
+
+    // put data in database
+    let path_vars = [
+      'ppt',
+      data.participant_id,
+      'responseList',
+      data.day,
+      data.trial_number
+    ]
+
+    DB.ref(path_vars.join('/')).set(data.trial_data);
+
+    return 0;
+  } else {
+    return 1;
+  }
+}
+
+/**
 * Upload information to the realtime database.
 * @param {Object} data with information to be uploaded. Must contain:
 * @param {String} data.participant_id participant ID
@@ -519,6 +550,7 @@ let notifyWaitingList = function() {
 module.exports = {
   addToWaitingList,
   bookAppts,
+  uploadTrial,
   uploadData,
   sendFirstEmail,
   setAsNoShow,

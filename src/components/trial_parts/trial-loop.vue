@@ -9,7 +9,7 @@
       :stim-ref="stim.twister"
       :currently-pressed-keys = "currentlyPressedKeys"
       :needs-response = "true"
-      @done="between_trials = true"
+      @done="endTrial"
       @no-keys-pressed="nkp_error = true"
     ></trial>
   </div>
@@ -69,6 +69,17 @@ export default {
     },
     mapToKey(finger) {
       return this.$props.fingersToKeys[finger]
+    },
+    endTrial(payload) {
+      this.between_trials = true;
+
+      // trigger upload to server
+      this.$emit('upload', {
+        'trial_number': this.currentStim,
+        'trial_data': payload
+      })
+
+      return;
     },
     nextTrial() {
 
@@ -156,7 +167,7 @@ export default {
   computed: {
     refresher: function() { // whether current trial is a "refresher" trial or not
       return ((this.currentStim + 1) % this.refresherFreq === 0
-        && this.currentStim > this.refresherFreq - 1
+        && this.currentStim >= this.refresherFreq - 1
         && this.random_pane !== null
         && this.currentStim < this.stimList.length - 1)
     }

@@ -46,6 +46,7 @@ module.exports = {
   'calcCompletionStatus': FUNCTIONS.https.onCall(getters.calcCompletionStatus),
   'addToWaitingList': FUNCTIONS.https.onCall(setters.addToWaitingList),
   'bookAppts': FUNCTIONS.https.onCall(setters.bookAppts),
+  'uploadTrial': FUNCTIONS.https.onCall(setters.uploadTrial),
   'uploadData': FUNCTIONS.https.onCall(setters.uploadData),
   'sendFirstEmail': FUNCTIONS.https.onCall(setters.sendFirstEmail),
   'setAsNoShow': FUNCTIONS.https.onCall(setters.setAsNoShow),
