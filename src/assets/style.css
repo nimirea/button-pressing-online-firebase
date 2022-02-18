@@ -473,3 +473,7 @@ img {
   transform: translate(-50%, -50%);
   cursor: pointer;
 }
+.overlay button {
+  font-weight: bold;
+  font-size: 2.5rem;
+}
