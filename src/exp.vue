@@ -38,6 +38,7 @@
     <!-- instructions -->
     <instructions
       v-if="taskList[currentTask].name === 'equipment-setup'"
+      :ppt-id='participant_id'
       :n-stim="stimList.length"
       :day="day"
       :test-mode="test_mode"
@@ -48,7 +49,6 @@
       :key-abbrevs="keyAbbrevs"
     ></instructions>
 
-    <!-- TODO: actual trials -->
     <trial-loop
       v-if="taskList[currentTask].name === 'button-pressing'"
       :stim-list="stimList"

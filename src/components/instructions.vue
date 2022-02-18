@@ -19,6 +19,8 @@
 </template>
 <script>
 import instructionMod from './instruction_parts/instruction_module.vue'
+import { fb_functions } from "../fb_init.js"
+
 
 export default {
   name: 'instructions',
@@ -27,6 +29,7 @@ export default {
   },
   props: {
     expLen: Number,
+    pptId: String,
     day: Number,
     fingersToKeys: Object,
     keyPressed: String,
@@ -164,7 +167,7 @@ export default {
           text: ["Try this one on your own:"],
           tableau: {
             stimRef: "mRtRrL rRtRiL mLtRiR",
-            playable: false,
+            playable: true,
             needs_response: true
           },
           completionCondition: {
@@ -214,16 +217,23 @@ export default {
       if (this.current_module < this.modulesShownToday.length - 1) {
         this.current_module++;
       } else {
-        console.log("END OF INSTRUCTIONS")
-        this.$emit('advance');
+        let ud = fb_functions.httpsCallable('uploadData')
+        ud({
+          'participant_id': 'ppt/' + this.pptId,
+          'day': this.day,
+          'timestamp_name': 'startTime'
+        }).then(() => {
+          this.$emit('advance');
+        })
+
       }
     }
   },
-  mounted: function() {
-    if (this.testMode === true) {
-      this.current_module = this.modulesShownToday.length - 1
-    }
-  },
+  // mounted: function() {
+  //   if (this.testMode === true) {
+  //     this.current_module = this.modulesShownToday.length - 1
+  //   }
+  // },
   computed: {
     modulesShownToday() {
       let vm = this;
