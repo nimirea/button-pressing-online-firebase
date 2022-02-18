@@ -221,7 +221,7 @@ export default {
         ud({
           'participant_id': 'ppt/' + this.pptId,
           'day': this.day,
-          'timestamp_name': 'startTime'
+          'timestamp_name': 'startedTime'
         }).then(() => {
           this.$emit('advance');
         })
