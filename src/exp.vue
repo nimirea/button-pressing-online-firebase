@@ -71,8 +71,7 @@
       :windowListenersToRemove="{
         'keydown': keyDownListener,
         'keyUp': keyUpListener,
-        'blur': blurListener,
-        'focus': focusListener
+        'blur': blurListener
       }"
       @submit='updateTimeRemaining(day, () => {
           expOver = true;
@@ -88,7 +87,7 @@
     </div>
   </div>
 <div v-if="unfocused" class="overlay">
-  <p>Please click here and put your hands on the provided keyboard to continue the experiment.</p>
+  <p>Please click <button @click='focusListener'>here</button> and put your hands back on the provided keyboard to continue the experiment.</p>
 </div>
 </div>
 </template>
@@ -365,7 +364,6 @@ export default {
 
       // window blur
       window.addEventListener('blur', v.blurListener)
-      window.addEventListener('focus', v.focusListener)
 
       // getting participant ID from URL
       var urlParams = new URLSearchParams(window.location.search);
