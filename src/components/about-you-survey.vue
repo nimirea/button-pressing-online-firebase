@@ -17,7 +17,7 @@
 
   <h3>Sleep Habits</h3>
 
-  <textbox-multipart question-text="How much sleep do you need per day (24 hour period?)"
+  <textbox-multipart question-text="How much sleep do you need per day (24 hour period?) "
     v-model="answers.ksq.q1"
     :text-types="['integer', 'integer']"
     :response-labels="['hours', 'minute(s)']"
