@@ -75,7 +75,6 @@ export default {
     (this.questions).forEach((element) => {
       var options_for_this_question = this.options_and_descriptions.slice(0);
       if (typeof(element) != 'string') {
-        console.log(typeof(element));
         options_for_this_question.push(element.additional_answer)
       }
 
