@@ -1,6 +1,8 @@
 <template>
 <loading-view v-if="uploading === true"></loading-view>
 <div v-else>
+  <p>Please switch back to your own keyboard and mouse/trackpad to answer the following questions.</p>
+
   <h2>Equipment</h2>
 
   <p>Which browser are you using?</p>
