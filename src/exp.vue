@@ -375,7 +375,6 @@ export default {
           if (this.test_mode === true) {
             this.prevDayIncomplete = false;
             this.alreadyDone = false;
-            this.currentTask = 2; // test post-task survey
           } else {
             this.prevDayIncomplete = res.data.prevDayIncomplete;
             this.alreadyDone = res.data.alreadyDone;
