@@ -68,7 +68,9 @@
     <post-task-survey
       :ppt-id='participant_id'
       :day='day'
-      @submit='stopTask'>
+      @submit='updateTimeRemaining(day, () => {
+          expOver = true;
+        })'>
     </post-task-survey>
     </div>
 
@@ -373,6 +375,7 @@ export default {
           if (this.test_mode === true) {
             this.prevDayIncomplete = false;
             this.alreadyDone = false;
+            this.currentTask = 2; // test post-task survey
           } else {
             this.prevDayIncomplete = res.data.prevDayIncomplete;
             this.alreadyDone = res.data.alreadyDone;
