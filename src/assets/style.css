@@ -291,9 +291,10 @@ input, textarea {
   gap: 1rem;
 }
 
-.option-list > span label > span {
+.option-list > span label > span, .option-list > span label.enter-text {
   display: block;
 }
+
 
 .example-img {
   /* max-width: 100%; */

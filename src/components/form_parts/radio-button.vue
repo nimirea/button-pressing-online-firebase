@@ -7,7 +7,7 @@
       :id="name + '-' + value | regularize"
       @change="updateView"
     >&nbsp;
-    <label v-bind:for="name + '-' + value | regularize">
+    <label v-bind:for="name + '-' + value | regularize" :class="{ 'enter-text': enterText}">
         {{label}}
         <textbox-question v-if="enterText === true"
           v-model="textbox_value"
