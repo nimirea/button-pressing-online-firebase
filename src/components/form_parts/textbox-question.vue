@@ -8,9 +8,9 @@
       @focus="$emit('focus')"
       :class="something_entered === true? 'filled-out' : ''"
       :style="{width: boxSize === 's' ? '3rem' : 'default'}"/>
-    &nbsp;<span v-if="displayUnits === true && unit != ''">{{ unit }}</span>
-    <label v-if="questionPosition == 'after'" :for="regularize(questionText)">&nbsp;{{ questionText }}</label>
-    &nbsp;
+    <span v-if="displayUnits === true && unit != ''">&nbsp;{{ unit }}</span>
+    <label v-if="questionPosition == 'after' && questionText != ''" :for="regularize(questionText)">&nbsp;{{ questionText }}</label>
+    <span v-if="questionText != ''">&nbsp;</span>
 
     <ul v-if="inline == false && errors.length > 0 && attempted === true" class="survey-error">
       <li v-for="errorMessage in errors" class="survey-error" v-bind:key="errorMessage">{{ errorMessage }}</li>

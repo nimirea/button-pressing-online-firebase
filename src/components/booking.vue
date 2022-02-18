@@ -46,7 +46,7 @@
         :min="18"
         text-type="number"
         @error-catch="updateFormErrors"></textbox-question>
-      <textbox-multipart question-text="height:"
+      <textbox-multipart question-text="height: "
         v-model="form_answers.height"
         :text-types="['integer', 'number']"
         :response-labels="['feet', 'inch(es)']"

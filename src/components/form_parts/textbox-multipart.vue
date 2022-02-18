@@ -1,7 +1,7 @@
 <template>
 
-  <p v-bind:style="{'display': inline === true ? 'inline' : 'block'}">
-    {{ questionText }}&nbsp;
+  <p v-bind:style="{'display': inline === true ? 'inline-block' : 'block', 'margin': 0}">
+    {{ questionText }}<span if="questionText != ''"> </span>
     <span v-for="(responseLabel, responseIdx) in iterList" v-bind:key="responseLabel">
       <time-entry
         v-model="response_parts[responseIdx]"
@@ -22,7 +22,8 @@
         :box-size="boxSize"
         :display-units="displayUnits"
         @error-catch="updateAppState"></textbox-question>
-      <span v-if="responseIdx != iterList.length - 1 && delimiter != ''">{{ delimiter }}&nbsp;</span>
+      <span v-if="responseIdx != iterList.length - 1 && delimiter != ''">{{ delimiter }}
+      </span>
     </span>
 
     <ul v-if="error_list.length > 0 && attempted === true" class="survey-error">

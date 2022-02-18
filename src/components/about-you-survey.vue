@@ -46,42 +46,46 @@
 
     <ul>
       <li>Work days:
-          <textbox-multipart question-text=""
+        <ul>
+          <li><textbox-multipart question-text=""
             v-model="answers.ksq.q3_work_1"
             :text-types="['time', 'time']"
             :response-labels="['Go to bed (put the lights out) at', 'and wake up at']"
             :response-label-position="'before'"
-            @error-catch="updateFormErrors"></textbox-multipart>
-          <textbox-question question-text="Time before falling asleep (after putting the lights out)?"
+            @error-catch="updateFormErrors"></textbox-multipart></li>
+          <li><textbox-question question-text="Time before falling asleep (after putting the lights out)?"
             v-model="answers.ksq.q3_work_2"
             :text-type="'integer'"
             :unit="'minutes'"
-            @error-catch="updateFormErrors"></textbox-question>
-          <textbox-multipart question-text=""
+            @error-catch="updateFormErrors"></textbox-question></li>
+          <li><textbox-multipart question-text=""
             v-model="answers.ksq.q3_work_3"
             :text-types="['time', 'time']"
             :response-labels="['Regular nap from', 'until']"
             :response-label-position="'before'"
-            @error-catch="updateFormErrors"></textbox-multipart>
+            @error-catch="updateFormErrors"></textbox-multipart></li>
+          </ul>
       </li>
       <li>Off days:
-        <textbox-multipart question-text=""
-          v-model="answers.ksq.q3_off_1"
-          :text-types="['time', 'time']"
-          :response-labels="['Go to bed (put the lights out) at', 'and wake up at']"
-          :response-label-position="'before'"
-          @error-catch="updateFormErrors"></textbox-multipart>
-        <textbox-question question-text="Time before falling asleep (after putting the lights out)?"
-          v-model="answers.ksq.q3_off_2"
-          :text-type="'integer'"
-          :unit="'minutes'"
-          @error-catch="updateFormErrors"></textbox-question>
-        <textbox-multipart question-text=""
-          v-model="answers.ksq.q3_off_3"
-          :text-types="['time', 'time']"
-          :response-labels="['Regular nap from', 'until']"
-          :response-label-position="'before'"
-          @error-catch="updateFormErrors"></textbox-multipart>
+        <ul>
+          <li><textbox-multipart question-text=""
+            v-model="answers.ksq.q3_off_1"
+            :text-types="['time', 'time']"
+            :response-labels="['Go to bed (put the lights out) at', 'and wake up at']"
+            :response-label-position="'before'"
+            @error-catch="updateFormErrors"></textbox-multipart></li>
+          <li><textbox-question question-text="Time before falling asleep (after putting the lights out)?"
+            v-model="answers.ksq.q3_off_2"
+            :text-type="'integer'"
+            :unit="'minutes'"
+            @error-catch="updateFormErrors"></textbox-question></li>
+          <li><textbox-multipart question-text=""
+            v-model="answers.ksq.q3_off_3"
+            :text-types="['time', 'time']"
+            :response-labels="['Regular nap from', 'until']"
+            :response-label-position="'before'"
+            @error-catch="updateFormErrors"></textbox-multipart></li>
+        </ul>
       </li>
     </ul>
 
