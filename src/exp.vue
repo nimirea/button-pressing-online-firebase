@@ -68,6 +68,12 @@
     <post-task-survey
       :ppt-id='participant_id'
       :day='day'
+      :windowListenersToRemove="{
+        'keydown': keyDownListener,
+        'keyUp': keyUpListener,
+        'blur': blurListener,
+        'focus': focusListener
+      }"
       @submit='updateTimeRemaining(day, () => {
           expOver = true;
         })'>
@@ -313,6 +319,27 @@ export default {
       });
 
 
+    },
+
+    keyDownListener: function(e) {
+      if (this.currentlyPressedKeys.map((k) => { return k.key }).includes(e.key) !== true) {
+        this.keyFunction(e);
+      }
+    },
+
+    keyUpListener: function(e) {
+      this.currentlyPressedKeys = this.currentlyPressedKeys.filter(k => k.key !== e.key)
+      if (this.thumbWaitInterval != null) {
+        clearInterval(this.thumbWaitInterval);
+        this.waitText = "";
+      }
+    },
+
+    blurListener: function() {
+      this.unfocused = true;
+    },
+    focusListener: function() {
+      this.unfocused = false;
     }
 
 
@@ -332,26 +359,12 @@ export default {
       let v = this;
 
       // keys:
-      window.addEventListener('keydown', (e) => {
-        if (v.currentlyPressedKeys.map((k) => { return k.key }).includes(e.key) !== true) {
-          v.keyFunction(e);
-        }
-      });
-      window.addEventListener('keyup', (e) => {
-        v.currentlyPressedKeys = v.currentlyPressedKeys.filter(k => k.key !== e.key)
-        if (this.thumbWaitInterval != null) {
-          clearInterval(v.thumbWaitInterval);
-          v.waitText = "";
-        }
-      });
+      window.addEventListener('keydown', v.keyDownListener);
+      window.addEventListener('keyup', v.keyUpListener);
 
       // window blur
-      window.addEventListener('blur', () => {
-        v.unfocused = true;
-      })
-      window.addEventListener('focus', () => {
-        v.unfocused = false;
-      })
+      window.addEventListener('blur', v.blurListener)
+      window.addEventListener('focus', v.focusListener)
 
       // getting participant ID from URL
       var urlParams = new URLSearchParams(window.location.search);

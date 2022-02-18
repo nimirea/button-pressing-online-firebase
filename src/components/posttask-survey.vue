@@ -84,7 +84,7 @@ import loadingView from './loading-view.vue'
 
 export default {
   name: 'post-task-survey',
-  props: ['pptId', 'day'],
+  props: ['pptId', 'day', 'windowListenersToRemove'],
   components: {
     radioButtonQuestion,
     textboxQuestion,
@@ -123,6 +123,19 @@ export default {
       // set perfectFormState based on this
       var errorSum = Object.values(this.errorCounts).reduce((a,b) => a + b);
       this.perfectFormState = (errorSum === 0);
+    }
+  },
+  created: function() {
+    // remove all window listeners
+    if (Object.keys(this.windowListenersToRemove).length > 0) {
+
+      for (const windowListener in this.windowListenersToRemove) {
+
+        window.removeEventListener(windowListener, this.windowListenersToRemove[windowListener])
+        console.log("removed " + windowListener)
+
+      }
+
     }
   }
 }
