@@ -41,11 +41,15 @@ let getAvailableTimeslots = function (include_dropoffs = true) {
       return(result);
     }).then((data) => {
 
-        // store start time in prev_booked only
-        prev_booked = data.items.map((item) => {
-          // translate to UTC time
-          return date_utils.parseISOLocal(item.start['dateTime']).toISOString()
-        });
+        prev_booked = [];
+
+        if (data.items !== undefined) {
+          // store start time in prev_booked only
+          prev_booked = data.items.map((item) => {
+            // translate to UTC time
+            return date_utils.parseISOLocal(item.start['dateTime']).toISOString()
+          });
+        }
 
         // parameters for splitting up slots
         let appt_slots = []
