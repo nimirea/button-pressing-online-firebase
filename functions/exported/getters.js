@@ -132,10 +132,16 @@ let getBookedTimeslots = function(args) {
       'maxTime': args.maxTime
     }
   ).then((data) => {
-    let parsed_titles = data.items.map((item) => {
-      let parsed_title = date_utils.parseEventTitle(item.summary);
-      return parsed_title;
-    });
+    let parsed_titles = []
+    if (data.items !== undefined) {
+
+      parsed_titles = data.items.map((item) => {
+        let parsed_title = date_utils.parseEventTitle(item.summary);
+        return parsed_title;
+      });
+
+    }
+
     return parsed_titles;
   })
 }
