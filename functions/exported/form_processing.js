@@ -233,7 +233,7 @@ exports.submitData = function(surveyData) {
             })
         } else {
           return mail.send_as_template(
-            "Participating in Multiple-Day Button-Pressing Research Study",
+            "Participating in Multiple-Day Button-Pressing Experiment",
             "consent_link",
             {
               consent_link: "https://" + constants.urls.exp + "/?email=" + to_upload.email
