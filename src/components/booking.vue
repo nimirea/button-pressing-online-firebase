@@ -212,6 +212,7 @@ export default {
       })
     },
     filterApptOptions: function(desired_eventType, desired_group) {
+
       let return_obj = {
         'labels': [],
         'values': []
@@ -252,7 +253,8 @@ export default {
       if (this.appointment_choices.pickup === undefined) {
         return {}
       } else {
-        return this.filterApptOptions("dropoff", this.available_timeslots[this.appointment_choices.pickup].group)
+        let filtered = this.filterApptOptions("dropoff", this.available_timeslots[this.appointment_choices.pickup].group)
+        return filtered
       }
     }
   },

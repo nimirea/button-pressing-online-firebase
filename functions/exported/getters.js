@@ -59,60 +59,74 @@ let getAvailableTimeslots = function (include_dropoffs = true) {
         let blockInfo = {}
         let weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
-        // store all available appointment blocks in appt_blocks
-        for (var cal_event in events_list) {
+        // start enumerating events only at
+        let starting_event_idx = events_list.indexOf(
+          events_list.find(element => {
+            return element.summary.includes("pickup")
+          })
+        )
 
-          blockInfo = {
-            startTime: date_utils.parseISOLocal(events_list[cal_event].start['dateTime']),
-            endTime: date_utils.parseISOLocal(events_list[cal_event].end['dateTime'])
-          }
-          blockInfo.dayOfWeek = blockInfo.startTime.getDay() // 1 for Monday, 5 for Friday
-          if (events_list[cal_event].summary.includes("pickup")) {
-            blockInfo.eventType = "pickup"
-          } else if (events_list[cal_event].summary.includes("dropoff")) {
-            blockInfo.eventType = "dropoff"
-          }
-          // calculate block group
-          blockInfo.group = Math.floor(cal_event / 2);
-          console.log(blockInfo.group);
+        if (starting_event_idx !== undefined) {
 
-          if (include_dropoffs === true || blockInfo.eventType === "pickup") {
+          events_list = events_list.slice(starting_event_idx, events_list.length)
+          console.log(events_list.length)
+          console.log(starting_event_idx)
 
-            // split block into chunks
-            let availability_length = date_utils.getTimeDiff(blockInfo.startTime, blockInfo.endTime, "minutes").diff
-            for (var slot_idx = 0 ; slot_idx < availability_length/appt_length; slot_idx++ ) {
+          // store all available appointment blocks in appt_blocks
+          for (var cal_event in events_list) {
 
-              slotInfo = {
-                dayOfWeek: weekdays[blockInfo.dayOfWeek],
-                slotIdx: slot_idx,
-                offsetMins: [],
-                eventType: blockInfo.eventType, // for filtering by appointments in the same "group"
-                group: blockInfo.group
-              }
-
-              for (var tt in time_markers) {
-                tt = Number(tt)
-                let time_type = time_markers[tt]
-                adjusted_time = new Date(blockInfo.startTime)
-                adjusted_time.setMinutes( adjusted_time.getMinutes() + (slot_idx + tt) * appt_length)
-
-                slotInfo[time_type] = adjusted_time.toISOString()
-                slotInfo[time_type + "_local"] = adjusted_time.toLocaleString("en-US", {timeZone: "America/Chicago"});
-              }
-
-              // check that this slot isn't booked already
-              if (!(prev_booked.includes(slotInfo.startTime))) {
-
-                // manipulate strings for Chicago time
-                let startInfo = slotInfo.startTime_local.split(date_divider)
-                let stopTime = slotInfo.endTime_local.split(date_divider)[1].replace(":00 ", " ")
-                let startTime = startInfo[1].replace(":00 ", " ")
-                slotInfo["label"] = startTime + " to " + stopTime + " on " + slotInfo.dayOfWeek + ", " + startInfo[0];
-
-                appt_slots.push(slotInfo)
-              }
+            blockInfo = {
+              startTime: date_utils.parseISOLocal(events_list[cal_event].start['dateTime']),
+              endTime: date_utils.parseISOLocal(events_list[cal_event].end['dateTime'])
             }
+            blockInfo.dayOfWeek = blockInfo.startTime.getDay() // 1 for Monday, 5 for Friday
+            if (events_list[cal_event].summary.includes("pickup")) {
+              blockInfo.eventType = "pickup"
+            } else if (events_list[cal_event].summary.includes("dropoff")) {
+              blockInfo.eventType = "dropoff"
+            }
+            // calculate block group
+            blockInfo.group = Math.floor(cal_event / 2);
+            console.log(blockInfo.group + " " + blockInfo.startTime);
 
+            if (include_dropoffs === true || blockInfo.eventType === "pickup") {
+
+              // split block into chunks
+              let availability_length = date_utils.getTimeDiff(blockInfo.startTime, blockInfo.endTime, "minutes").diff
+              for (var slot_idx = 0 ; slot_idx < availability_length/appt_length; slot_idx++ ) {
+
+                slotInfo = {
+                  dayOfWeek: weekdays[blockInfo.dayOfWeek],
+                  slotIdx: slot_idx,
+                  offsetMins: [],
+                  eventType: blockInfo.eventType, // for filtering by appointments in the same "group"
+                  group: blockInfo.group
+                }
+
+                for (var tt in time_markers) {
+                  tt = Number(tt)
+                  let time_type = time_markers[tt]
+                  adjusted_time = new Date(blockInfo.startTime)
+                  adjusted_time.setMinutes( adjusted_time.getMinutes() + (slot_idx + tt) * appt_length)
+
+                  slotInfo[time_type] = adjusted_time.toISOString()
+                  slotInfo[time_type + "_local"] = adjusted_time.toLocaleString("en-US", {timeZone: "America/Chicago"});
+                }
+
+                // check that this slot isn't booked already
+                if (!(prev_booked.includes(slotInfo.startTime))) {
+
+                  // manipulate strings for Chicago time
+                  let startInfo = slotInfo.startTime_local.split(date_divider)
+                  let stopTime = slotInfo.endTime_local.split(date_divider)[1].replace(":00 ", " ")
+                  let startTime = startInfo[1].replace(":00 ", " ")
+                  slotInfo["label"] = startTime + " to " + stopTime + " on " + slotInfo.dayOfWeek + ", " + startInfo[0];
+
+                  appt_slots.push(slotInfo)
+                }
+              }
+
+            }
           }
         }
 
