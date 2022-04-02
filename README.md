@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This directory contains code for running the speech experiments (and scheduling participants) on a Firebase instance. The speech experiments are written using the Vue.js framework on the front end, and Firebase on the backend.
+This directory contains code for running the button-pressing experiment (and scheduling participants) on a Firebase instance. The experiment code is written using the Vue.js framework on the front end, and Firebase on the backend.
 
 ## Usage Guide
 
@@ -14,9 +14,9 @@ Here are steps for how to get your study online, under a Firebase project that y
 
 1. Create a Google Firebase account, if you don't have one already.
 2. Install the [Firebase CLI](https://firebase.google.com/docs/cli/) on your local machine
-3. Set up a Firebase project first. Make sure that you select the Blaze plan, which lets you use cloud functions. At the time of writing, it is quite cheap to host data on there—I do not expect to pay more than \$1 total to run about 100 participants in this experiment.
+3. Set up a Firebase project first. Make sure that you select the Blaze plan, which lets you use cloud functions. At the time of writing, it is quite cheap to host data on there—I do not expect to pay more than \$1 total to run about 50 participants in this experiment.
 4. Create a new web app as part of your Firebase project, and copy the configuration info from this app to `src/fb_init.js.sample`. Remove '.sample' from the end of this file.
-5. Run `firebase init` in _this_ directory. Add the realtime database, hosting, storage, pubsub, and emulators as options. Link it to your just-created project. You'll want to set the hosting directory to `dist` instead of the default `public`.
+5. Run `firebase init` in _this_ directory. Add the realtime database, hosting, pubsub, and emulators as options. Link it to your just-created project. You'll want to set the hosting directory to `dist` instead of the default `public`.
 6. Run `npm install` inside this directory to update packages as needed.
 
 #### 2. Firebase Functions (Backend) Configuration Setup
@@ -146,7 +146,7 @@ While the experiment is online, participants will interact with the study like t
 
 ##### Setting Availability For Appointments
 
-Experimenter availability can be set using Google calendar, by creating events on the `EXP_AVAILABILITY_CALENDAR` described above. Each event will be split into 15-minute appointment timeslots, and an equal number of timeslots should be available on Mondays and Fridays.
+Experimenter availability can be set using Google calendar, by creating events on the `EXP_AVAILABILITY_CALENDAR` described above. Each event will be split into appointment timeslots according to the appointment length you specified in the config. Pick-up and drop-off times will be paired based on what is nearest (i.e., the a pick-up will always be paired with the drop-off slot that starts soonest after it), and you should use the title of the availability event to signal whether the appointments booked in that event will be pick-ups (include "pickup" somewhere in the availability event title) or drop-offs (include "dropoff" in the title).
 
 ##### Using the Experimenter Dashboard
 
@@ -158,7 +158,7 @@ On the morning of each appointment, participants will receive an invitation to c
 
 ###### At The Appointment
 
-At pick-up appointments, the experimenter has the opportunity to confirm pick-up and send the link to the first day's session, or to mark the participant as a no-show.
+At pick-up appointments, the experimenter has the opportunity to confirm pick-up and send the link to the first day's session, or to mark the participant as a no-show, which will cancel their events.
 
 At drop-off appointments, the experimenter can confirm that equipment has been dropped off. This can help keep track of which participants have yet to return their equipment for following up.
 
@@ -168,9 +168,8 @@ When new spots open up, experimenters can email participants who tried to sign u
 
 ## Limitatations
 
-These experiments and the experimenter dashboard should work in the latest version of all browsers except Internet Explorer (which doesn't let you record audio without flash) or mobile phone browsers, because most (all?) smartphone operating systems don't let browsers record audio, for privacy reasons.
+The experiments should work in the latest version of all browsers except Safari and Internet Explorer. The experiment dashboard should work in any browser.
 
 ## Credit
 
-* Many thanks to Chun Chan for help figuring out how to record audio using JavaScript, push it to the Firebase server, and display a volume meter during the setup phase.
-* Thanks to Matt Goldrick and the members of Soundlab for beta testing the experiment and providing helpful feedback on design!
+* Thanks to Matt Goldrick and the members of Soundlab for beta testing the experiment and providing helpful feedback on design and setup instructions!
