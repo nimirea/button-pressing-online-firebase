@@ -88,6 +88,17 @@
       :labels="['Yes', 'No']"
     ></radio-button-question>
 
+    <h2>Previous Participation</h2>
+
+    <p>Since April 2021, have you taken part in a multiple-day research study involving an online tongue-twister task, entitled either “Tongue-Twisters Across Multiple Days” or “Prior Knowledge and Novel Phonotactic Patterns”? (You can verify your participation by searching your email archive for emails from multinight.study@gmail.com.)</p>
+
+    <radio-button-question
+      v-model="survey_answers.participated_in_speech_exp"
+      group-id="participated_in_speech_exp"
+      @error-catch="updateFormErrors"
+      :labels="['Yes', 'No']"
+    ></radio-button-question>
+
     <h2>Contact</h2>
     <textbox-question
       v-model="survey_answers.email"
@@ -162,7 +173,8 @@ export default {
         this.survey_answers.native_lang == null ||
         this.survey_answers.lang_disorder == null ||
         this.survey_answers.sleep_disorder == null ||
-        this.survey_answers.computer == null
+        this.survey_answers.computer == null ||
+        this.survey_answers.participated_in_speech_exp == null
       ) {
         this.perfectFormState = false
       } else {

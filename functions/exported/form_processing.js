@@ -145,7 +145,8 @@ exports.submitData = function(surveyData) {
       surveyData.sleep_disorder === undefined ||
       surveyData.headphones === undefined ||
       surveyData.computer === undefined ||
-      surveyData.ports === undefined
+      surveyData.ports === undefined ||
+      surveyData.participated_in_speech_exp === undefined
     ) {
     is_eligible = false;
   } else {
@@ -157,6 +158,9 @@ exports.submitData = function(surveyData) {
       is_eligible = false;
     } else if (surveyData.native_lang !== 'English') {
       // do they not have English as native language?
+      is_eligible = false;
+    } else if (surveyData.participated_in_speech_exp === 'Yes') {
+      // have they participated in the speech experiments?
       is_eligible = false;
     } else if (surveyData.lang_disorder === 'Yes') {
       // do they have a history of language disorder
