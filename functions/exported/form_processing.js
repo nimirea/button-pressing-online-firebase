@@ -13,13 +13,16 @@ const date_utils = require('../date_utilities');
 exports.checkCOVID = function(submitted_data) {
 
   let data = submitted_data.answers
+
   let result = false;
 
   // do the checking
   if ('symptoms' in data && data.symptoms.length > 0) {
     // showing symptoms
     result = true;
-  } else if (Object.values(data).includes('Yes')) {
+  } else if (Object.values(data).slice(0, 3).includes('Yes')) {
+    result = true;
+  } else if (Object.values(data)[3] === "Yes" && Object.values(data)[4] === "No") {
     result = true;
   }
 

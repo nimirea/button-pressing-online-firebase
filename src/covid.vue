@@ -12,6 +12,15 @@
         ></radio-button-question>
       </div>
 
+      <div v-if="answers[3] === 'Yes'">
+        <p>Did you have a negative COVID-19 test result in the past 5 days?</p>
+        <radio-button-question
+          v-model="answers[4]"
+          :group-id="4 + ''"
+          @error-catch="updateFormErrors"
+        ></radio-button-question>
+      </div>
+
       <p>In the past 14 days, have you experienced any of the following symptoms? (Check all that apply.)</p>
       <checkbox-question
         v-model="answers.symptoms"
@@ -29,7 +38,7 @@
 
     <div v-else-if="COVIDstatus === false">
       <h1>Thanks!</h1>
-      <p>Your appointment is confirmed. We'll see you later today!</p>
+      <p>Your appointment is confirmed. We'll see you soon!</p>
     </div>
     <div v-else-if="COVIDstatus === true">
       <h1>Please reschedule your appointment.</h1>
@@ -61,16 +70,18 @@ export default {
   data: function() {
     return {
       yesno_questions: [
-        'In the past 40 days, have you tested positive for COVID-19?',
-        'Are you currently under investigation for COVID-19 and not yet aware if you tested positive or negative?',
-        'In the past 14 days, were you or a member of your household advised to self-isolate for COVID-19 by government officials or healthcare providers?',
+        'Are you immunocompromised (have a weakened immune system)?',
+        'In the past 20 days, have you been hospitalized for COVID-19?',
+        'In the past 10 days, have you tested positive for COVID-19?',
+        'In the past 10 days, have you had direct exposure to someone who has tested positive for or is suspected to have COVID-19?'
       ],
       symptoms: [
         'Fever or chills',
         'Mild or moderate difficulty breathing or shortness of breath',
         'New or worsening cough',
         'Sustained loss of smell, taste, or appetite',
-        'Sore throat'
+        'Sore throat',
+        'Runny or stuffy nose'
       ],
       perfectFormState: false,
       ppt_id: null,
@@ -90,7 +101,9 @@ export default {
       if (
         this.answers[0] === undefined ||
         this.answers[1] === undefined ||
-        this.answers[2] === undefined
+        this.answers[2] === undefined ||
+        this.answers[3] === undefined ||
+        this.answers[3] === 'Yes' && this.answers[4] === undefined
       ) {
         this.perfectFormState = false
       } else {
@@ -105,10 +118,14 @@ export default {
       var submitData = fb_functions.httpsCallable('checkCOVID');
       let self = this;
 
+      let questions_asked = self.yesno_questions
+      questions_asked.push("Did you have a negative COVID-19 test result in the past 5 days?")
+      console.log(questions_asked)
+
       return submitData({
         answers: this.answers,
         ppt_id: this.ppt_id,
-        questions: this.yesno_questions
+        questions: questions_asked
       }).then((returned_COVIDstatus) => {
         self.COVIDstatus = returned_COVIDstatus.data
         self.uploading = false
