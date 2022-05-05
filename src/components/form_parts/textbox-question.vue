@@ -12,9 +12,10 @@
     <label v-if="questionPosition == 'after' && questionText != ''" :for="regularize(questionText)">&nbsp;{{ questionText }}</label>
     <span v-if="questionText != ''">&nbsp;</span>
 
-    <ul v-if="inline == false && errors.length > 0 && attempted === true" class="survey-error">
+    <ul v-if="inline == false && errors.length > 0 && attempted === true && (errors.length !== 1 || ['must be a valid email'].every(function (element) {return errors.includes(element)}) === false)" class="survey-error">
       <li v-for="errorMessage in errors" class="survey-error" v-bind:key="errorMessage">{{ errorMessage }}</li>
     </ul>
+
   </p>
 </template>
 
@@ -34,6 +35,10 @@ export default {
       default: "before"
     },
     inline: {
+      type: Boolean,
+      default: false
+    },
+    required: {           // whether something is required to be entered
       type: Boolean,
       default: false
     },
@@ -115,6 +120,8 @@ export default {
             this.errors.push("value too low")
           }
         }
+      } else if (this.something_entered === false && this.required === true) {
+        this.errors.push("please enter a value")
       }
 
       this.$emit('input', newValue);

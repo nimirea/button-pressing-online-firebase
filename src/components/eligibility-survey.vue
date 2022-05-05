@@ -105,6 +105,7 @@
       @error-catch="updateFormErrors"
       question-text="Please provide your email address, so we can contact you if you are eligible:"
       text-type="email"
+      :required="true"
     ></textbox-question>
 
     <p>(If you are not eligible, your email address will not be stored.)</p>
