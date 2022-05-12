@@ -29,14 +29,6 @@
     :values="['bt', 'wired', 'none']"
   ></radio-button-question>
 
-  <p>When recording your voice, which microphone did you use?</p>
-  <radio-button-question
-    v-model="survey_answers.microphone"
-    group-id="microphone"
-    :labels="['Headphone microphone', 'Computer’s built-in microphone', 'Other external microphone']"
-    :values="['headphone', 'built-in', 'external']"
-  ></radio-button-question>
-
   <h2>Sleep</h2>
 
   <textbox-question
