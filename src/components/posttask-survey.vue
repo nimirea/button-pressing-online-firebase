@@ -21,7 +21,7 @@
     :other-option="true"
   ></radio-button-question>
 
-  <p>What type of headphones did you use to complete the tongue-twister task?</p>
+  <p>What type of headphones did you use to complete the task?</p>
   <radio-button-question
     v-model="survey_answers.headphones"
     group-id="headphones"
