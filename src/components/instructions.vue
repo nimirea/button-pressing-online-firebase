@@ -14,18 +14,21 @@
       @advance="nextModule()"
     ></instruction-mod>
   </div>
+  <loading-view v-if="loading" :page-view="false"></loading-view>
 </div>
 
 </template>
 <script>
 import instructionMod from './instruction_parts/instruction_module.vue'
+import loadingView from './loading-view.vue'
 import { fb_functions } from "../fb_init.js"
 
 
 export default {
   name: 'instructions',
   components: {
-    instructionMod
+    instructionMod,
+    loadingView
   },
   props: {
     expLen: Number,
@@ -40,6 +43,7 @@ export default {
   },
   data: () => {
     return {
+      loading: false,
       current_module: 0, // initialize current module at 0
       modules: [ // list of modules to show
         {
@@ -217,6 +221,7 @@ export default {
       if (this.current_module < this.modulesShownToday.length - 1) {
         this.current_module++;
       } else {
+        this.loading = true
         let ud = fb_functions.httpsCallable('uploadData')
         ud({
           'participant_id': 'ppt/' + this.pptId,
