@@ -118,7 +118,7 @@ let appointmentReminder = function(item) {
       appt_type: appt_name.toLowerCase(),
       appt_length_mins: constants.appt_length_mins,
       time_formatted: appt_start_time,
-      instructions: ppt_info.event_type === "dropoff" ? " Please bring your activity monitor (Fitbit) and keyboard to the appointment." : "",
+      instructions: ppt_info.event_type === "dropoff" ? " Please bring the activity monitor (Fitbit) and keyboard to the appointment." : "",
       loc: constants.location,
       covid_screener_link: "https://" + constants.urls.exp + "/covid-screener?ppt=" + ppt_info.ppt_id,
       parking_instructions: constants.parking_instructions
@@ -301,22 +301,22 @@ let runAllFunctions = function() {
         // ignore events if they've been rescheduled
         if (date_utils.parseEventTitle(item.summary).event_note !== "rescheduled") {
 
-          await sendWhen(
-            functionToRun = appointmentReminder,
-            argsToFunction = item,
-            anchorTime = date_utils.parseISOLocal(item.start.dateTime),
-            localRunTime = null,
-            offsetHours = -24
-          )
+          // await sendWhen(
+          //   functionToRun = appointmentReminder,
+          //   argsToFunction = item,
+          //   anchorTime = date_utils.parseISOLocal(item.start.dateTime),
+          //   localRunTime = null,
+          //   offsetHours = -24
+          // )
 
-          // emails before specific events
-          await sendWhen(
-            functionToRun = remindCOVIDScreener,
-            argsToFunction = item,
-            anchorTime = date_utils.parseISOLocal(item.start.dateTime),
-            localRunTime = null,
-            offsetHours = -2
-          );
+          // // emails before specific events
+          // await sendWhen(
+          //   functionToRun = remindCOVIDScreener,
+          //   argsToFunction = item,
+          //   anchorTime = date_utils.parseISOLocal(item.start.dateTime),
+          //   localRunTime = null,
+          //   offsetHours = -2
+          // );
         }
 
 

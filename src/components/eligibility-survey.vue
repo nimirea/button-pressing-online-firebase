@@ -88,6 +88,15 @@
       :labels="['Yes', 'No']"
     ></radio-button-question>
 
+    <p>Specialized equipment is required to complete this study, which you will need to pick up and drop off <i>in person</i> on the Northwestern Evanston campus. <b>Are you available to travel to the Northwestern Evanston campus twice (for pick-up and drop-off of equipment) within the next month?</b></p>
+
+    <radio-button-question
+      v-model="survey_answers.location"
+      group-id="location"
+      @error-catch="updateFormErrors"
+      :labels="['Yes', 'No']"
+    ></radio-button-question>
+
     <h2>Previous Participation</h2>
 
     <p>Since April 2021, have you taken part in a multiple-day research study involving an online tongue-twister task, entitled either “Tongue-Twisters Across Multiple Days” or “Prior Knowledge and Novel Phonotactic Patterns”? (You can verify your participation by searching your email archive for emails from multinight.study@gmail.com.)</p>
@@ -170,6 +179,7 @@ export default {
       if (
         this.survey_answers.email == null ||
         this.survey_answers.available == null ||
+        this.survey_answers.location == null ||
         this.survey_answers.age18orolder == null ||
         this.survey_answers.native_lang == null ||
         this.survey_answers.lang_disorder == null ||

@@ -30,7 +30,7 @@
     </ul>
 
     <h2>Why am I being asked to take part in this research study?</h2>
-    <p>We are asking you to take part in this research study because you have responded to our screening survey indicating that you are an adult native English speaker with no history of speech, hearing, language, or sleep disorder, and that you have no history of colorblindness. In addition, you indicated that you own the equipment necessary to complete the button-pressing task, and that you would be willing to log into the study at the same time for 2 days in a row.</p>
+    <p>We are asking you to take part in this research study because you have responded to our screening survey indicating that you are an adult native English speaker with no history of speech, hearing, language, or sleep disorder, and that you have no history of colorblindness. In addition, you indicated that you own the equipment necessary to complete the button-pressing task, and that you would be willing to log into the study at the same time for 2 days in a row and travel to Northwestern for equipment drop-off/pick-up.</p>
 
     <h2>How many people will be in this study?</h2>
     <p>We expect about 130 people will be in this research study.</p>
@@ -101,7 +101,7 @@
       </li>
     </ul>
 
-    <p>In addition, you will receive reimbursement for transportation, parking, or other expenses you may incur when picking up and returning the study equipment.</p>
+    <p>In addition, you will receive reimbursement for any public transit, taxi, rideshare, or parking expenses you may incur when picking up and returning the study equipment.</p>
 
     <h2>Who can I talk to?</h2>
     <p>If you have questions, concerns, or complaints, you can contact Principal Investigator Matt Goldrick (<a href="mailto:matt-goldrick@northwestern.edu">matt-goldrick@northwestern.edu</a>) and Nicole Mirea (<a href="mailto:nimirea@u.northwestern.edu">nimirea@u.northwestern.edu</a>).</p>
@@ -145,7 +145,7 @@ export default {
       compensation: [13, 17],
       given_data: {},
       uploading: false,
-      consent_version: 2
+      consent_version: 3
     }
   },
   methods: {

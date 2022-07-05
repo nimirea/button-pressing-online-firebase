@@ -1,9 +1,9 @@
 Hi there,
 
-Thank you for picking up your equipment! Here is the link to your first study session: {{{ study_link }}}
+Thank you for picking up the equipment! Here is the link to your first study session: {{{ study_link }}}
 
 This session will take around 1 hour to complete. Because you will be using the USB keyboard to record responses, we ask that you use a laptop or desktop computer (NOT a smartphone or tablet) to access the study. You can use Chrome, Firefox, or Microsoft Edge to access the experiment. Please do NOT use Safari or Internet Explorer. Please complete the session in a quiet environment, with no distractions.
 
 In order to complete {{ total_sessions_text }} sessions before your drop-off appointment on {{{ dropoff_datetime_formatted }}}, we recommend starting your first session before {{{ latest_start_datetime_formatted_timefirst }}}.
 
-If you have any questions, please let us know. Please remember to wear your Fitbit on nights between sessions.
+If you have any questions, please let us know. Please remember to wear the Fitbit at night between sessions.

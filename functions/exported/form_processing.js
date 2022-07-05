@@ -149,7 +149,8 @@ exports.submitData = function(surveyData) {
       surveyData.headphones === undefined ||
       surveyData.computer === undefined ||
       surveyData.ports === undefined ||
-      surveyData.participated_in_speech_exp === undefined
+      surveyData.participated_in_speech_exp === undefined ||
+      surveyData.location === undefined
     ) {
     is_eligible = false;
   } else {
@@ -158,6 +159,9 @@ exports.submitData = function(surveyData) {
 
     if (surveyData.available === 'No') {
       // are they available?
+      is_eligible = false;
+    } else if (surveyData.location === 'No') {
+      // are they available to travel to NU for pick-up/drop-off
       is_eligible = false;
     } else if (surveyData.native_lang !== 'English') {
       // do they not have English as native language?
