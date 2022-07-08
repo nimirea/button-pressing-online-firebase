@@ -309,14 +309,14 @@ let runAllFunctions = function() {
           //   offsetHours = -24
           // )
 
-          // // emails before specific events
-          // await sendWhen(
-          //   functionToRun = remindCOVIDScreener,
-          //   argsToFunction = item,
-          //   anchorTime = date_utils.parseISOLocal(item.start.dateTime),
-          //   localRunTime = null,
-          //   offsetHours = -2
-          // );
+          // emails before specific events
+          await sendWhen(
+            functionToRun = remindCOVIDScreener,
+            argsToFunction = item,
+            anchorTime = date_utils.parseISOLocal(item.start.dateTime),
+            localRunTime = null,
+            offsetHours = -2
+          );
         }
 
 
