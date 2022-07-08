@@ -1,6 +1,8 @@
 <template>
 <div id="app" v-cloak>
 
+    <loading-view v-if="loading" :page-view="true"></loading-view>
+
     <!-- check for outdated browser -->
     <div v-if="browserOutdated">
       <h1>Unsupported browser</h1>
@@ -37,7 +39,7 @@
 
     <!-- instructions -->
     <instructions
-      v-if="taskList[currentTask].name === 'equipment-setup'"
+      v-if="taskList[currentTask].name === 'equipment-setup' & loading === false"
       :ppt-id='participant_id'
       :n-stim="stimList.length"
       :day="day"
@@ -100,6 +102,7 @@
 import postTaskSurvey from './components/posttask-survey.vue'
 import instructions from './components/instructions.vue'
 import trialLoop from './components/trial_parts/trial-loop.vue'
+import loadingView from './components/loading-view.vue'
 
 // Initialize Cloud Functions through Firebase
 import { fb_functions } from "./fb_init.js"
@@ -112,10 +115,12 @@ export default {
   components: {
     instructions,
     postTaskSurvey,
-    trialLoop
+    trialLoop,
+    loadingView
   },
   data: function() {
     return {
+      loading: true, // initialize as loading
       stream: {},
       snd: {}, // sound to be played
       analyserNode: {}, // volume meter
@@ -351,6 +356,7 @@ export default {
     var msie = ua.indexOf("MSIE ");
     if (msie > 0 || !!navigator.userAgent.match(/Trident.*rv:11\./)) {
       this.browserOutdated = true;
+      this.loading = false;
     }
 
     if (this.browserOutdated === false) {
@@ -390,6 +396,10 @@ export default {
           } else {
             this.prevDayIncomplete = res.data.prevDayIncomplete;
             this.alreadyDone = res.data.alreadyDone;
+
+            if (this.prevDayIncomplete === true) {
+              this.loading = false;
+            }
           }
 
           if (this.alreadyDone === false) {
@@ -400,6 +410,7 @@ export default {
                 // update timingCorrect dynamically
                 if (this.minsRemaining > 0) {
                   this.timingCorrect = "early";
+                  this.loading = false;
                 } else {
                   this.timingCorrect = "just right";
                 }
@@ -502,6 +513,8 @@ export default {
                 'stimList': stims_to_upload
               });
 
+            }).then(() => {
+              this.loading = false;
             })
 
         });
