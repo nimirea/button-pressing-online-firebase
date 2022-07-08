@@ -119,17 +119,22 @@ exports.checkExperimenterPW = function(data) {
   require('dotenv').config();
 
   if (data === process.env.EXP_DASHBOARD_PW) {
-    return DB.ref("ppt").once('value').then((snapshot) => {
-      let all_data = snapshot.val()
+    return DB.ref("ppt").once('value')
+      .then((snapshot) => {
+        let all_data = snapshot.val()
 
-      if (all_data !== null && all_data !== undefined) {
-        Object.values(all_data).forEach((ppt_info) => {
-          delete ppt_info["stimList"];
-        })
-      }
+        if (all_data !== null && all_data !== undefined) {
+          Object.values(all_data).forEach((ppt_info) => {
+            delete ppt_info["stimList"];
+          })
+        } else {
+          console.log(all_data)
+        }
 
-      return all_data;
-    });
+        return all_data;
+      }).catch((error) => {
+        console.log(error)
+      });
   } else {
     return "Sorry, incorrect password"
   }
