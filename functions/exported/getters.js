@@ -351,7 +351,7 @@ let calcCompletionStatus = function(data) {
 /* Calcualte latest start time that a participant should have, passing in the
 * dropoff event directly so we don't have to make so many calls to calendar
 */
-let calcLatestStartTimeFromDropoff = function(dropoff_event, num_hours_before = 1) {
+let calcLatestStartTimeFromDropoff = function(dropoff_event, num_hours_before = 2) {
 
   event_parsed = date_utils.parseEventTitle(dropoff_event.summary);
 
