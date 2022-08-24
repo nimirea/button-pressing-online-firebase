@@ -233,6 +233,7 @@ let uploadData = function(data) {
 
       carryover_ppt_data = ppt_data
 
+      // TODO fix memory leak HERE—this is only used to get the number of participants in the database currently, which can be stored/updated elsewhere! We shouldn't need to retrieve EVERYTHING in order to get this value.
       return DB.ref('ppt').once('value')
     }).then((snapshot) => {
 

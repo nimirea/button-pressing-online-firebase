@@ -276,25 +276,25 @@ let runAllFunctions = function() {
         // dropoff appointments only
         if (date_utils.parseEventTitle(item.summary).event_type === "dropoff") {
 
-          getters.calcLatestStartTimeFromDropoff(item)
-            .then(async (last_starttime) => {
-
-              console.log("last start_time: " + last_starttime)
-
-              await sendWhen(
-                functionToRun = startTaskReminder,
-                argsToFunction = item,
-                anchorTime = last_starttime,
-                localRunTime = dailyRunTime
-              );
-
-              return 0;
-
-            })
-            .catch((error) => {
-              console.log(error);
-              return 1;
-            })
+          // getters.calcLatestStartTimeFromDropoff(item)
+          //   .then(async (last_starttime) => {
+          //
+          //     console.log("last start_time: " + last_starttime)
+          //
+          //     await sendWhen(
+          //       functionToRun = startTaskReminder,
+          //       argsToFunction = item,
+          //       anchorTime = last_starttime,
+          //       localRunTime = dailyRunTime
+          //     );
+          //
+          //     return 0;
+          //
+          //   })
+          //   .catch((error) => {
+          //     console.log(error);
+          //     return 1;
+          //   })
 
         }
 
