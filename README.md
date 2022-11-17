@@ -170,6 +170,8 @@ When new spots open up, experimenters can email participants who tried to sign u
 
 The experiments should work in the latest version of all browsers except Safari and Internet Explorer. The experiment dashboard should work in any browser.
 
+**KNOWN ISSUE**: As currently configured, participant info is stored in the same object as trial responses, and since the whole database is downloaded every time the dashboard is refreshed, this can lead to time-outs. This can also crash the sessions if the database is too large. If you have a PR that would fix this, please feel free to make that change.  
+
 ## Credit
 
 * Thanks to Matt Goldrick and the members of Soundlab for beta testing the experiment and providing helpful feedback on design and setup instructions!
