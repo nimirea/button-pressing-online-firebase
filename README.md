@@ -4,6 +4,8 @@
 
 This directory contains code for running the button-pressing experiment (and scheduling participants) on a Firebase instance. The experiment code is written using the Vue.js framework on the front end, and Firebase on the backend.
 
+**See "Limitations" below for known issues.**
+
 ## Usage Guide
 
 ### Technical Setup
